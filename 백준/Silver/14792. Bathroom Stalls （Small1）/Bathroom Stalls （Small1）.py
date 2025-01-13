@@ -8,13 +8,10 @@ def main():
         n, k = map(int, input().split())
         dict = {n:1}
         q = deque([n])
-        while q:
+        while k > 0 and q:
             cur = q.popleft()
             cnt = dict[cur]
             max_gap, min_gap = cur // 2, (cur - 1) // 2
-            if k <= cnt:
-                print(f"Case #{i}:", max_gap, min_gap)
-                break
             k -= cnt
             if max_gap == 0:
                 continue
@@ -30,6 +27,7 @@ def main():
             else:
                 dict[min_gap] = cnt
                 q.append(min_gap)
+        print(f"Case #{i}:", max_gap, min_gap)
 
 if __name__ == "__main__":
     main()
