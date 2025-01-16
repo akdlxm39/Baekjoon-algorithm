@@ -5,29 +5,33 @@ def main():
     n = int(input())
     month = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
     flowers = []
-    new = 0
-    idx = 0
     for _ in range(n):
         m1, d1, m2, d2 = map(int, input().split())
         flowers.append((month[m1] + d1, month[m2] + d2))
-        if flowers[-1][0] <= 60:
-            new = max(new, flowers[-1][1])
-            idx += 1
     flowers.sort()
 
-    cnt = 0
-    while True:
-        cnt += 1
-        cur = new
-        if cur >= 335:
+    new = 0
+    cnt = 1
+    cur = 60
+    for s, e in flowers:
+        if s <= cur:
+            new = max(new, e)
+            if new >= 335:
+                print(cnt)
+                break
+        else:
+            cur = new
+            cnt += 1
+            if s <= cur:
+                new = e
+            else:
+                print(0)
+                break
+    else:
+        if new >= 335:
             print(cnt)
-            break
-        while idx < n and flowers[idx][0] <= cur:
-            new = max(new, flowers[idx][1])
-            idx += 1
-        if cur == new:
+        else:
             print(0)
-            break
 
 if __name__ == "__main__":
     main()
