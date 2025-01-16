@@ -1,8 +1,6 @@
 import sys
-from heapq import heapify, heappush, heappop
 input = sys.stdin.readline
 
-# 60 ~ 335
 def main():
     n = int(input())
     month = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
@@ -11,10 +9,10 @@ def main():
     idx = 0
     for _ in range(n):
         m1, d1, m2, d2 = map(int, input().split())
-        if month[m1] + d1 <= 60:
-            new = max(new, month[m2] + d2)
-        else:
-            flowers.append((month[m1] + d1, month[m2] + d2))
+        flowers.append((month[m1] + d1, month[m2] + d2))
+        if flowers[-1][0] <= 60:
+            new = max(new, flowers[-1][1])
+            idx += 1
     flowers.sort()
 
     cnt = 0
@@ -24,7 +22,7 @@ def main():
         if cur >= 335:
             print(cnt)
             break
-        while idx < len(flowers) and flowers[idx][0] <= cur:
+        while idx < n and flowers[idx][0] <= cur:
             new = max(new, flowers[idx][1])
             idx += 1
         if cur == new:
