@@ -7,7 +7,7 @@ def solve(x, m, size):
     for i in range(size):
         if x[m-i-1] == x[m+i+1]:
             return False
-    if solve(x, m-size//2-1, size//2) and solve(x, m+size//2+1, size//2):
+    if solve(x, m-size//2-1, size//2):
         return True
     return False
 
