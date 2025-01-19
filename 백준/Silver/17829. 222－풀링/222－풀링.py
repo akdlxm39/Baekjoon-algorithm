@@ -4,10 +4,8 @@ input = sys.stdin.readline
 def solve(matrix, size, x, y):
     if size == 1:
         return matrix[x][y]
-    l = []
-    for i in range(x, x+size, size//2):
-        for j in range(y, y+size, size//2):
-            l.append(solve(matrix, size//2, i, j))
+    new_size = size//2
+    l = [solve(matrix, new_size, x, y), solve(matrix, new_size, x, y+new_size), solve(matrix, new_size, x+new_size, y), solve(matrix, new_size, x+new_size, y+new_size)]
     return sorted(l)[2]
 
 def main():
