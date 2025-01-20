@@ -22,11 +22,9 @@ def main():
     n = int(input())
     l = k = 0
     size = [3]
-    for i in range(1, n//2):
-        size.append(2 * size[-1] + i + 3)
-        if size[-1] >= n:
-            k = i
-            break
+    while size[-1] <= n:
+        size.append(2 * size[-1] + k + 4)
+        k += 1
     print(solve(n-1, l, size, k))
 
 
