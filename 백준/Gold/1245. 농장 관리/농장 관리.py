@@ -13,7 +13,7 @@ def solve(n, m, farm, visited, queue, l):
             nx, ny = x + dx, y + dy
             if (dx == 0 and dy == 0) or not (0 <= nx < n and 0 <= ny < m):
                 continue
-            if farm[nx][ny] == farm[x][y] and not visited[nx][ny]:
+            if not visited[nx][ny] and farm[nx][ny] == farm[x][y]:
                 queue.append((nx, ny))
             elif farm[nx][ny] > farm[x][y]:
                 flag = 0
