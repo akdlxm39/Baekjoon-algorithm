@@ -3,11 +3,10 @@ from collections import deque
 from itertools import product
 input = sys.stdin.readline
 
-def solve(n, m, farm, visited, queue, l):
+def solve(n, m, farm, visited, queue):
     flag = 1
     while queue:
         x, y = queue.popleft()
-        l.append((x, y))
         visited[x][y] = True
         for dx, dy in product([-1, 0, 1], repeat=2):
             nx, ny = x + dx, y + dy
@@ -25,14 +24,12 @@ def main():
     cnt = 0
     visited = [[False] * m for _ in range(n)]
     queue = deque()
-
     for i in range(n):
         for j in range(m):
             if visited[i][j]:
                 continue
-            l = []
             queue.append((i, j))
-            cnt += solve(n, m, farm, visited, queue, l)
+            cnt += solve(n, m, farm, visited, queue)
     print(cnt)
 
 if __name__ == "__main__":
