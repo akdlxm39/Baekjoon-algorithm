@@ -13,6 +13,8 @@ def main():
             continue
         ans += cost
         link[root[a]] |= (link[root[b]])
+        if len(link[root[a]]) == n:
+            break
         for x in link[root[b]]:
             root[x] = root[a]
     print(ans)
