@@ -3,14 +3,21 @@ input = sys.stdin.readline
 
 def main():
     str = input().rstrip()
-    stack = []
+    p_cnt = 0
+    a_flag = False
     for c in str:
-        if c == 'P' and stack[-3:] == ['P', 'P', 'A']:
-            stack.pop()
-            stack.pop()
+        if c == 'P':
+            if a_flag:
+                p_cnt -= 1
+                a_flag = False
+            else:
+                p_cnt += 1
+        elif p_cnt >= 2 and not a_flag:
+            a_flag = True
         else:
-            stack.append(c)
-    if len(stack) == 1 and stack[0] == 'P':
+            p_cnt = -1
+            break
+    if p_cnt == 1:
         print("PPAP")
     else:
         print("NP")
