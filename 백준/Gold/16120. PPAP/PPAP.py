@@ -5,7 +5,7 @@ def main():
     str = input().rstrip()
     stack = []
     for c in str:
-        if len(stack) >= 3 and stack[-3:] == ['P', 'P', 'A'] and c == 'P':
+        if c == 'P' and len(stack) >= 3 and stack[-3:] == ['P', 'P', 'A']:
             stack.pop()
             stack.pop()
         else:
