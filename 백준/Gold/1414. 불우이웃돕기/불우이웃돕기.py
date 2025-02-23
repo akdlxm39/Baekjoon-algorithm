@@ -13,17 +13,21 @@ def change(x):
 def main():
     n = int(input())
     ans = 0
-    lans = [list(map(change, list(input().rstrip()))) for _ in range(n)]
-    for l in lans:
-        ans += sum(l)
+    lans = [[] for _ in range(n)]
+    for i in range(n):
+        s = input().rstrip()
+        for j, c in enumerate(s):
+            if c == '0':
+                continue
+            m = change(c)
+            ans += m
+            lans[i].append((m, j))
+            lans[j].append((m, i))
     heap = []
+    for x in lans[0]:
+        heappush(heap, x)
     visited = [False] * n
     visited[0] = True
-    for i in range(1, n):
-        if lans[0][i]:
-            heappush(heap, (lans[0][i], i))
-        if lans[i][0]:
-            heappush(heap, (lans[i][0], i))
     cnt = n-1
     while heap and cnt:
         lan, cur = heappop(heap)
@@ -32,13 +36,10 @@ def main():
         ans -= lan
         visited[cur] = True
         cnt -= 1
-        for i in range(n):
-            if visited[i]:
+        for x in lans[cur]:
+            if visited[x[1]]:
                 continue
-            if lans[cur][i]:
-                heappush(heap, (lans[cur][i], i))
-            if lans[i][cur]:
-                heappush(heap, (lans[i][cur], i))
+            heappush(heap, x)
     print(-1 if cnt else ans)
 
 if __name__ == "__main__":
