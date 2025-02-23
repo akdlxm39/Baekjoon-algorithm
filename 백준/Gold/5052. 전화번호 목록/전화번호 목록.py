@@ -6,11 +6,7 @@ def main():
         n = int(input())
         nums = sorted(input().rstrip() for _ in range(n))
         for i in range(1, n):
-            x = min(len(nums[i-1]), len(nums[i]))
-            for j in range(x):
-                if nums[i][j] != nums[i-1][j]:
-                    break
-            else:
+            if nums[i].startswith(nums[i-1]):
                 break
         else:
             print("YES")
