@@ -1,7 +1,7 @@
 import sys
 input = sys.stdin.readline
 
-M = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+M = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
 def main():
     n, l, f = input().split()
@@ -13,7 +13,7 @@ def main():
         idx = s[3] + ' ' + s[2]
         _, month, days= map(int, s[0].split('-'))
         hours, minutes = map(int, s[1].split(':'))
-        time = ((sum(M[:month]) + days)*24 + hours)*60 + minutes
+        time = ((M[month] + days)*24 + hours)*60 + minutes
         if not(idx in rental and rental[idx]):
             rental[idx] = time + l
         else:
