@@ -17,7 +17,7 @@ def war(suzerain_of, win, lose):
 
 def main():
     n, m = map(int, input().split())
-    kingdoms_dict = dict([(input().rstrip(), i) for i in range(n)])
+    kingdoms_dict = {input().rstrip():i for i in range(n)}
     suzerain_of = list(range(n))
     for _ in range(m):
         k1, k2, w = input().rstrip().split(',')
