@@ -3,25 +3,32 @@ sys.setrecursionlimit(10**9)
 input = sys.stdin.readline
 
 def get_substrings(n):
-    s = str(n)
-    res = set()
-    for i in range(len(s)):
-        for j in range(i+1, len(s)+1):
-            res.add(int(s[i:j]))
-    res.remove(n)
-    if 0 in res:
-        res.remove(0)
-    return sorted(res)
+    for i in range(1, len(str(n))+1):
+        for j in range(i):
+            tmp = (n%(10**i))//(10**j)
+            if tmp != n and tmp != 0:
+                yield tmp
+
+    
+def can_win(memo, n):
+    if memo[n] is not None:
+        return memo[n]
+    for k in get_substrings(n):
+        if not can_win(memo, n-k):
+            memo[n] = True
+            break
+    else:
+        memo[n] = False
+    return memo[n]
 
 def main():
     n = int(input())
-    how_win = [-1]*(n+1)
-    for i in range(10, n+1):
-        for k in get_substrings(i):
-            if how_win[i-k] == -1:
-                how_win[i] = k
-                break
-    print(how_win[-1])
+    memo = [False]*(10) + [None]*(n-9)
+    ans = 1000000
+    for k in get_substrings(n):
+        if not can_win(memo, n-k) and k < ans:
+            ans = k
+    print(ans if ans < 1000000 else -1)
 
 if __name__ == "__main__":
     main()
