@@ -1,31 +1,27 @@
 import sys
 input = sys.stdin.readline
 
-class userDB:
-    def __init__(self, name=''):
-        self.name = name
-        self.name_count = 0
-        self.next_alpha = dict()
-
-    def add_user(self, name, i=0):
-        # return nickname
-        if i == len(name):
-            self.name_count += 1
-            return self.name + (str(self.name_count) if self.name_count > 1 else '')
-        if name[i] not in self.next_alpha:
-            self.next_alpha[name[i]] = userDB(self.name+name[i])
-            nickname = self.name+name[i]
-            self.next_alpha[name[i]].add_user(name, i+1)
-        else:
-            nickname = self.next_alpha[name[i]].add_user(name, i+1)
-        return nickname
-
 def main():
     n = int(input())
-    users = userDB()
+    prefix_set = set()
+    name_count = dict()
+    nicknames = []
     for _ in range(n):
-        s = input().rstrip()
-        print(users.add_user(s))
+        name = input().rstrip()
+        nickname = ''
+        for i in range(1, len(name)+1):
+            cur_prefix = name[:i]
+            if not nickname and cur_prefix not in prefix_set:
+                nickname = cur_prefix
+            prefix_set.add(cur_prefix)
+        if name not in name_count:
+            name_count[name] = 0
+        name_count[name] += 1
+        if not nickname:
+            count = name_count[name]
+            nickname = name + (str(count) if count > 1 else '')
+        nicknames.append(nickname)
+    print('\n'.join(nicknames))
 
 if __name__ == "__main__":
     main()
