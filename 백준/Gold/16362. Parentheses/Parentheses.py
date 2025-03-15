@@ -39,9 +39,6 @@ def main():
             else:
                 flag = -1
                 break
-        else:
-            flag = -1
-            break
     if flag == -1 or stack:
         print('error')
     elif alpha == 1 and oper == 0 and flag == 0:
