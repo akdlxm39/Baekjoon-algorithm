@@ -5,19 +5,18 @@ def main():
     price, a, b = map(int, input().split())
     if a < b:
         a, b = b, a
-    acnt = price//a+1
+    acnt, bcnt = (price-1)//a+1, 0
     ans = cur = a * acnt
-    memo = {cur:True}
+    memo = {cur}
     while acnt:
-        nxt = cur - a
-        tmp = price - nxt
-        cur = nxt + (tmp//b+(tmp%b!=0))*b
-        ans = min(ans, cur)
+        acnt -= 1
+        if acnt*a +bcnt*b < price:
+            bcnt = (price - acnt*a - 1) // b + 1
+        cur = acnt*a +bcnt*b
         if cur in memo:
             break
-        else:
-            memo[cur] = True
-        acnt -= 1
+        memo.add(cur)
+        ans = min(ans, cur)
     print(ans)
 
 if __name__ == "__main__":
