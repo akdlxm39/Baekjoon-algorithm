@@ -1,8 +1,5 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
-
-delta = [(0,1), (1,0), (0,-1), (-1,0)]
 
 def shuffle(k, matrix, opers, used, cnt):
     if cnt == k:
@@ -12,17 +9,15 @@ def shuffle(k, matrix, opers, used, cnt):
         if used[i]:
             continue
         used[i] = True
-        r, c, s = opers[i]
-        tmp = shuffle(k, rotation(matrix, r-1, c-1, s), opers, used, cnt+1)
-        ans = min(ans, tmp)
+        ans = min(ans, shuffle(k, rotation(matrix, *opers[i]), opers, used, cnt+1))
         used[i] = False
     return ans
 
 def rotation(matrix, r, c, s):
-    new_matrix = [[i for i in m] for m in matrix]
+    new_matrix = [row[:] for row in matrix]
     for d in range(1, s+1):
-        x, y = r-d, c-d
-        for dx, dy in delta:
+        x, y = r-1-d, c-1-d
+        for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
             for _ in range(2*d):
                 x, y, px, py = x + dx, y + dy, x, y
                 new_matrix[x][y] = matrix[px][py]
