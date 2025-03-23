@@ -19,7 +19,6 @@ def main():
             if m == 0:
                 break
             elif cranes[j] < boxes[-1]:
-                del cranes[j:]
                 n = j
                 break
             while i < m and cranes[j] < boxes[i]:
