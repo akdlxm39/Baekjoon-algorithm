@@ -13,12 +13,12 @@ def main():
         case1_flag = (case1_flag[1], (case1_flag[0]==case1_flag[1])!=(lamp1[i]==lamp2[i]))
         case2_cnt += case2_flag[1]
         case2_flag = (case2_flag[1], (case2_flag[0]==case2_flag[1])!=(lamp1[i]==lamp2[i]))
-    if case1_flag[1]:
-        case1_cnt = 100001
-    if case2_flag[1]:
-        case2_cnt = 100001
-    ans = min(case1_cnt, case2_cnt)
-    print(ans if ans != 100001 else -1)
+    if case1_flag[1] and case2_flag[1]:
+        print(-1)
+    elif case1_flag[1]:
+        print(case2_cnt)
+    else:
+        print(case1_cnt)
 
 if __name__ == "__main__":
     main()
