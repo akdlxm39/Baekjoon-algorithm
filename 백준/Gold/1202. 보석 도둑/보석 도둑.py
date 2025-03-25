@@ -2,27 +2,24 @@ import sys
 from heapq import heapify, heappush, heappop
 input = sys.stdin.readline
 
-def lower_bound(arr, x):
-    l, r = 0, len(arr)-1
-    while l <= r:
-        mid = (l+r)//2
-        if x >= arr[mid][0]:
-            l = mid+1
-        else:
-            r = mid-1
-    return l
-
 def main():
     n, k = map(int, input().split())
-    jewels = sorted(tuple(map(int, input().split())) for _ in range(n))
+    jewels = dict()
+    for _ in range(n):
+        m, v = map(int, input().split())
+        if m in jewels:
+            jewels[m].append(-v)
+        else:
+            jewels[m] = [-v]
+    jewels_m = sorted(jewels.keys())
     bags = sorted(int(input()) for _ in range(k))
     can_put = []
-    ans = l = 0
+    ans = index = 0
     for bag in bags:
-        r = lower_bound(jewels, bag)
-        for _, v in jewels[l:r]:
-            heappush(can_put, -v)
-        l = r
+        while index < len(jewels_m) and jewels_m[index] <= bag:
+            for x in jewels[jewels_m[index]]:
+                heappush(can_put, x)
+            index += 1
         if can_put:
             ans -= heappop(can_put)
     print(ans)
