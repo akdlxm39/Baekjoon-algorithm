@@ -10,10 +10,10 @@ def bfs(n, m, maps):
         x, y, dist, can_break = queue.popleft()
         for dx, dy in [(0,1),(1,0),(0,-1),(-1,0)]:
             nx, ny = x+dx, y+dy
+            if not (0<=nx<n and 0<=ny<m) or visited[nx][ny] == 2:
+                continue
             if nx == n-1 and ny == m-1:
                 return dist+1
-            elif not (0<=nx<n and 0<=ny<m) or visited[nx][ny] == 2:
-                continue
             if can_break:
                 visited[nx][ny] = 2
                 queue.append((nx, ny, dist+1, maps[nx][ny]==0))
