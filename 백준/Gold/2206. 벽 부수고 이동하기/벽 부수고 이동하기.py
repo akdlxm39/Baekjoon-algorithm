@@ -14,18 +14,18 @@ def bfs(n, m, maps):
                 return dist+1
             elif not (0<=nx<n and 0<=ny<m) or visited[nx][ny] == 2:
                 continue
-            if visited[nx][ny]<2 and maps[nx][ny]=='0' and can_break:
+            if can_break:
                 visited[nx][ny] = 2
-                queue.append((nx, ny, dist+1, can_break))
-            elif visited[nx][ny]==0 and not(maps[nx][ny]=='1' and not can_break):
+                queue.append((nx, ny, dist+1, maps[nx][ny]==0))
+            elif visited[nx][ny]==0 and maps[nx][ny]==0:
                 visited[nx][ny] = 1
                 queue.append((nx, ny, dist+1, False))
     return -1
 
 def main():
     n, m = map(int, input().split())
-    maps = [input().rstrip() for _ in range(n)]
-    print(1 if n+m==2 else bfs(n, m, maps))
+    maps = [list(map(int, list(input().rstrip()))) for _ in range(n)]
+    print(1 if n==1 and m==1 else bfs(n, m, maps))
 
 if __name__ == "__main__":
     main()
