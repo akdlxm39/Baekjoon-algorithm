@@ -3,16 +3,16 @@ from collections import deque
 input = sys.stdin.readline
 
 def bfs(adj_list, groups, x):
+    queue = deque([x])
     groups[x] = 1
-    queue = deque([(x, 1)])
     while queue:
-        cur, group_num = queue.popleft()
+        cur = queue.popleft()
         for nxt in adj_list[cur]:
-            if groups[nxt] == group_num:
+            if not groups[nxt]:
+                groups[nxt] = 3-groups[cur]
+                queue.append(nxt)
+            elif groups[nxt] == groups[cur]:
                 return False
-            if groups[nxt] == 0:
-                groups[nxt] = 3-group_num
-                queue.append((nxt, 3-group_num))
     return True
 
 def main():
@@ -30,10 +30,11 @@ def main():
             adj_list[v].append(u)
         groups = [0]*(vertex+1)
         for i in adj_list.keys():
-            if groups[i] == 0:
-                if not bfs(adj_list, groups, i):
-                    print("NO")
-                    break
+            if groups[i]:
+                continue
+            if not bfs(adj_list, groups, i):
+                print("NO")
+                break
         else:
             print("YES")
 
