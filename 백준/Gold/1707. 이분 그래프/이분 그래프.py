@@ -19,17 +19,13 @@ def main():
     k = int(input())
     for _ in range(k):
         vertex, edge = map(int, input().split())
-        adj_list = dict()
+        adj_list = [[] for _ in range(vertex+1)]
         for _ in range(edge):
             u, v = map(int, input().split())
-            if u not in adj_list:
-                adj_list[u] = []
-            if v not in adj_list:
-                adj_list[v] = []
             adj_list[u].append(v)
             adj_list[v].append(u)
         groups = [0]*(vertex+1)
-        for i in adj_list.keys():
+        for i in range(1, vertex+1):
             if groups[i]:
                 continue
             if not bfs(adj_list, groups, i):
