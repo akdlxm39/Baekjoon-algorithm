@@ -20,18 +20,9 @@ def main():
     points.sort(key=cmp_to_key(cmp))
     stack = [points[0], points[1]]
     for i in range(2, n):
-        while len(stack) >= 2:
-            c = ccw(stack[-2], stack[-1], points[i])
-            if c > 0:
-                stack.append(points[i])
-                break
-            elif c < 0:
-                stack.pop()
-            else:
-                if dist(stack[-2], stack[-1]) < dist(stack[-2], points[i]):
-                    stack.pop()
-                    stack.append(points[i])
-                break
+        while len(stack) >= 2 and ccw(stack[-2], stack[-1], points[i]) <= 0:
+            stack.pop()
+        stack.append(points[i])
     print(len(stack))
 
 if __name__ == "__main__":
