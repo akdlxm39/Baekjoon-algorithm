@@ -1,5 +1,5 @@
-import sys
-input = sys.stdin.readline
+import io, os
+input = io.BytesIO(os.read(0,os.fstat(0).st_size)).readline
 
 def union(root, i, j):
     root[find(root, i)] = find(root, j)
@@ -12,13 +12,13 @@ def find(root, i):
 def main():
     for _ in range(int(input())):
         n = int(input())
-        circles = [tuple(map(int, input().split())) for _ in range(n)]
+        x, y, r = [0]*n, [0]*n, [0]*n
+        for i in range(n):
+            x[i], y[i], r[i] = map(int, input().split())
         root = list(range(n))
         for i in range(1, n):
-            x1, y1, r1 = circles[i]
             for j in range(i):
-                x2, y2, r2 = circles[j]
-                if (r1 + r2) * (r1 + r2) >= (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1):
+                if (r[i] + r[j]) * (r[i] + r[j]) >= (x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j]):
                     union(root, i, j)
         ans = 0
         for i in range(n):
