@@ -5,11 +5,8 @@ def main():
     x, y, d, t = map(int, input().split())
     l = (x*x+y*y)**0.5
     n = l//d
-    if n:
-        ans = n*t + min(l%d, t)
-    else:
-        ans = t + min(d-l, t)
-    print(min(ans, l))
+    ans = min(n*t+l%d, (n+1)*t, l) if n else min(t+d-l, 2*t, l)
+    print(ans)
 
 if __name__ == "__main__":
     main()
