@@ -6,11 +6,10 @@ def main():
     l = (x*x+y*y)**0.5
     n = l//d
     if n:
-        a = l%d
-        ans = min(n*t+a, (n+1)*t, l)
+        ans = n*t + min(l%d, t)
     else:
-        ans = min(t+d-l, l, 2*t)
-    print(ans)
+        ans = t + min(d-l, t)
+    print(min(ans, l))
 
 if __name__ == "__main__":
     main()
