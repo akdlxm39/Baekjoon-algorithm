@@ -17,8 +17,6 @@ def main():
         for i in range(1, n):
             x1, y1, r1 = circles[i]
             for j in range(i):
-                if find(root, i) == find(root, j):
-                    continue
                 x2, y2, r2 = circles[j]
                 if (r1 + r2) * (r1 + r2) >= (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1):
                     union(root, i, j)
