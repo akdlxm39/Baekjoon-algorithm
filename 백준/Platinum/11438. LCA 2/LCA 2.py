@@ -3,7 +3,7 @@ from collections import deque
 input = sys.stdin.readline
 
 def make_tree(n, adj_list, parents, depths):
-    queue = deque([(1,0)])
+    queue = deque([(1, 0)])
     while queue:
         cur, depth = queue.popleft()
         depths[cur] = depth
@@ -25,10 +25,6 @@ def main():
     parents = [[0] * 20 for _ in range(n + 1)]
     depths = [-1] * (n + 1)
     make_tree(n, adj_list, parents, depths)
-    # print("depth:", depths)
-    # for i in range(1, n+1):
-    #     print(i, parents[i])
-
     m = int(input())
     for _ in range(m):
         a, b = map(int, input().split())
@@ -36,14 +32,12 @@ def main():
             a, b = b, a
         while depths[a] != depths[b]:
             a = parents[a][len(bin(depths[a] - depths[b]))-3]
-
         while a!=b:
             i = len(bin(depths[a]))-2
             while i > 0 and parents[a][i]==parents[b][i]:
                 i -= 1
             a, b = parents[a][i], parents[b][i]
         print(a)
-
 
 if __name__ == "__main__":
     main()
