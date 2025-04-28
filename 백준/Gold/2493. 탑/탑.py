@@ -6,8 +6,8 @@ def main():
     towers = [int(1e9)] + list(map(int, input().split()))
     stack = [0]
     ans = []
-    for i, tower in enumerate(towers[1:], 1):
-        while towers[stack[-1]] < tower:
+    for i in range(1, n+1):
+        while towers[stack[-1]] < towers[i]:
             stack.pop()
         ans.append(stack[-1])
         stack.append(i)
