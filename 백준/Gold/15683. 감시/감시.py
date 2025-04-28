@@ -7,47 +7,39 @@ cctv_dir_dict = {1: ((0,), (1,), (2,), (3,)),
                  4: ((0, 1, 2), (1, 2, 3), (2, 3, 0), (3, 0, 1)),
                  5: ((0, 1, 2, 3),)}
 
-def cnt_blind_spot(n, m, room):
-    cnt = 0
-    for i in range(n):
-        for j in range(m):
-            cnt += room[i][j]==0
-    return cnt
-
-def watch(n, m, room, i, j, dir_idxes):
-    new_room = [[room[x][y] for y in range(m)] for x in range(n)]
+def watch_set(n, m, room, i, j, dir_idxes):
+    res = set()
     for dir_idx in dir_idxes:
         dx, dy = directions[dir_idx]
-        x, y = i + dx, j + dy
-        while 0<=x<n and 0<=y<m and new_room[x][y] != 6:
-            if new_room[x][y] == 0:
-                new_room[x][y] = 7
-            x += dx
-            y += dy
-    return new_room
+        nx, ny = i + dx, j + dy
+        while 0<=nx<n and 0<=ny<m and room[nx][ny] != 6:
+            if room[nx][ny] == 0:
+                res.add((nx, ny))
+            nx += dx
+            ny += dy
+    return res
 
-def bruteforce(n, m, room, cctv, idx, ans):
-    if idx == len(cctv):
-        tmp = cnt_blind_spot(n, m, room)
-        ans[0] = min(ans[0], tmp)
+def bruteforce(n, m, room, cctv_sets, depth, seen_area, max_area):
+    if depth == len(cctv_sets):
+        max_area[0] = max(max_area[0], len(seen_area))
         return
-    i, j, k = cctv[idx]
-    for dir_idxes in cctv_dir_dict[k]:
-        new_room = watch(n, m, room, i, j, dir_idxes)
-        bruteforce(n, m, new_room, cctv, idx+1, ans)
+    for cctv_set in cctv_sets[depth]:
+        bruteforce(n, m, room, cctv_sets, depth + 1, seen_area | cctv_set, max_area)
 
 def main():
     n, m = map(int, input().split())
     room = [list(map(int, input().split())) for _ in range(n)]
-    cctv = []
+    cctv_sets = []
+    blind = 0
     for i in range(n):
         for j in range(m):
-            if 1 <= room[i][j] <= 5:
-                cctv.append((i, j, room[i][j]))
-    ans = [n*m]
-    bruteforce(n, m, room, cctv, 0, ans)
-    print(ans[0])
-
+            if room[i][j] == 0:
+                blind += 1
+            elif 1 <= room[i][j] <= 5:
+                cctv_sets.append([watch_set(n, m, room, i, j, dir_idxes) for dir_idxes in cctv_dir_dict[room[i][j]]])
+    max_area = [0]
+    bruteforce(n, m, room, cctv_sets, 0, set(), max_area)
+    print(blind-max_area[0])
 
 if __name__ == "__main__":
     main()
