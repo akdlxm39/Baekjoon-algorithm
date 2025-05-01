@@ -3,24 +3,19 @@ input = sys.stdin.readline
 dx, dy = [-1, 0, 1, 0], [0, 1, 0, -1]
 
 def robot(room, x, y, d):
-    cnt, flag = 0, True
+    cnt, room[x][y] = 1, 2
     while True:
-        if room[x][y] == 0:
-            room[x][y] = 2
-            cnt += 1
-            continue
-        if flag:
-            for i in range(4):
-                if room[x+dx[i]][y+dy[i]] == 0: break
-            else: flag = False
-        if flag:
-            d = (d + 3) % 4
+        for _ in range(4):
+            d = (d+3)%4
             nx, ny = x + dx[d], y + dy[d]
-            if room[nx][ny] == 0: x, y = nx, ny
+            if room[nx][ny] == 0:
+                x, y, room[nx][ny] = nx, ny, 2
+                cnt += 1
+                break
         else:
-            nx, ny = x - dx[d], y - dy[d]
-            if room[nx][ny] == 1: break
-            else: x, y, flag = nx, ny, True
+            x, y = x - dx[d], y - dy[d]
+            if room[x][y] == 1:
+                break
     return cnt
 
 def main():
