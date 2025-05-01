@@ -5,11 +5,14 @@ dx, dy, dz = [-1,1,0,0,0,0], [0,0,-1,1,0,0], [0,0,0,0,-1,1]
 
 def bfs(m, n, h, tomatoes):
     queue = deque()
+    not_yet = 0
     for i in range(h):
         for j in range(n):
             for k in range(m):
                 if tomatoes[i][j][k] == 1:
                     queue.append((i, j, k, 0))
+                elif tomatoes[i][j][k] == 0:
+                    not_yet += 1
     day = -1
     while queue:
         x, y, z, day = queue.popleft()
@@ -19,12 +22,8 @@ def bfs(m, n, h, tomatoes):
                 continue
             tomatoes[nx][ny][nz] = 1
             queue.append((nx, ny, nz, day+1))
-    for i in range(h):
-        for j in range(n):
-            for k in range(m):
-                if tomatoes[i][j][k] == 0:
-                    return -1
-    return day
+            not_yet -= 1
+    return day if not_yet == 0 else -1
 
 def main():
     m, n, h = map(int, input().split())
