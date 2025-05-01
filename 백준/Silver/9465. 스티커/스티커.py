@@ -5,11 +5,11 @@ def main():
     t = int(input())
     for _ in range(t):
         n = int(input())
-        stickers = [list(map(int, input().split())) for _ in range(2)]
-        top, bottom, non = stickers[0][0], stickers[1][0], 0
-        for i in range(1, n):
-            top, bottom, non = (stickers[0][i] + max(bottom, non),
-                                stickers[1][i] + max(top, non),
+        stickers = zip(map(int, input().split()), map(int, input().split()))
+        top = bottom = non = 0
+        for t, b in stickers:
+            top, bottom, non = (max(bottom, non) + t,
+                                max(top, non) + b,
                                 max(top, bottom))
         print(max(top, bottom, non))
 
