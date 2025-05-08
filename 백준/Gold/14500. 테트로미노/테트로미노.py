@@ -25,10 +25,10 @@ def main():
     n, m = map(int, input().split())
     paper = [list(map(int, input().split())) for _ in range(n)]
     ans = 0
-    for key in tetromino_shape.keys():
-        for i in range(n-key[0]):
-            for j in range(m-key[1]):
-                for shape in tetromino_shape[key]:
+    for (dn, dm), shapes in tetromino_shape.items():
+        for i in range(n-dn):
+            for j in range(m-dm):
+                for shape in shapes:
                     shape_sum = 0
                     for dx, dy in shape:
                         shape_sum += paper[i+dx][j+dy]
