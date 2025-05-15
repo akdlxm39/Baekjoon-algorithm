@@ -1,5 +1,4 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
 
 def main():
@@ -11,11 +10,9 @@ def main():
         elif b % 10 == 1:
             b //= 10
         else:
-            print(-1)
-            break
+            b = 0
         cnt += 1
-    else:
-        print(cnt if a == b else -1)
+    print(cnt if a == b else -1)
 
 if __name__ == "__main__":
     main()
