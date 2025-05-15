@@ -2,32 +2,39 @@ import sys
 from collections import deque
 input = sys.stdin.readline
 
-def fire_route(maze, fired, fires):
-    queue = deque(fires)
+def escape(r, c, maze, jihoon, fires):
+    visited = [[False]*c for _ in range(r)]
+    visited[jihoon[0]][jihoon[1]] = True
     for fx, fy in fires:
-        fired[fx][fy] = 0
-    while queue:
-        x, y = queue.popleft()
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            nx, ny = x + dx, y + dy
-            if fired[nx][ny] != -1 or maze[nx][ny] == '#' or maze[nx][ny] == '@':
-                continue
-            fired[nx][ny] = fired[x][y] + 1
-            queue.append((nx, ny))
-
-def escape_route(maze, fired, j):
-    queue = deque([(j[0], j[1], 1)])
-    while queue:
-        x, y, day = queue.popleft()
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            nx, ny = x + dx, y + dy
-            if maze[nx][ny] == '@':
-                return day
-            if maze[nx][ny] == '#' or -1 < fired[nx][ny] <= day:
-                continue
-            fired[nx][ny] = 0
-            queue.append((nx, ny, day+1))
+        visited[fx][fy] = True
+    fire_queue = fires
+    j_queue = [jihoon]
+    date = 1
+    while j_queue:
+        next_fire_queue = []
+        for fx, fy in fire_queue:
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nfx, nfy = fx + dx, fy + dy
+                if visited[nfx][nfy] or maze[nfx][nfy]=='#' or maze[nfx][nfy]=='@':
+                    continue
+                visited[nfx][nfy] = True
+                next_fire_queue.append((nfx, nfy))
+        fire_queue = next_fire_queue
+        next_j_queue = []
+        for jx, jy in j_queue:
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                njx, njy = jx + dx, jy + dy
+                if maze[njx][njy] == '@':
+                    return date
+                if visited[njx][njy] or maze[njx][njy] == '#':
+                    continue
+                visited[njx][njy] = True
+                next_j_queue.append((njx, njy))
+        j_queue = next_j_queue
+        date += 1
     return 'IMPOSSIBLE'
+
+
 
 def main():
     r, c = map(int, input().split())
@@ -40,9 +47,7 @@ def main():
         for j, x in enumerate(line):
             if x == 'F':
                 fires.append((i, j))
-    fired = [[-1]*c for _ in range(r)]
-    fire_route(maze, fired, fires)
-    print(escape_route(maze, fired, jihoon))
+    print(escape(r, c, maze, jihoon, fires))
 
 if __name__ == "__main__":
     main()
