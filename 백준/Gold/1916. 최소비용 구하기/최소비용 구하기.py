@@ -16,6 +16,8 @@ def main():
         if costs[cur] != -1:
             continue
         costs[cur] = cost
+        if cur == end:
+            break
         for nxt, nxt_cost in adj_list[cur]:
             if costs[nxt] != -1:
                 continue
