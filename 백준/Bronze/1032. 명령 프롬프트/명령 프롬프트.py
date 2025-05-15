@@ -4,9 +4,11 @@ input = sys.stdin.readline
 def main():
     n = int(input())
     ans = list(input().rstrip())
+    size = len(ans)
     for _ in range(n-1):
-        for i, c in enumerate(input().rstrip()):
-            if ans[i] != c:
+        word = input().rstrip()
+        for i in range(size):
+            if ans[i] != word[i]:
                 ans[i] = '?'
     print(''.join(ans))
 
