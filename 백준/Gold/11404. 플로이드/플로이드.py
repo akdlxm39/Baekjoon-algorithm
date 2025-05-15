@@ -12,9 +12,7 @@ def main():
         adj_matrix[s-1][e-1] = min(adj_matrix[s-1][e-1], cost)
     for k in range(n):
         for i in range(n):
-            if i == k: continue
             for j in range(n):
-                if j == k or j == i: continue
                 adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j])
     for line in adj_matrix:
         print(' '.join(map(lambda x: str(x) if x != INF else '0', line)))
