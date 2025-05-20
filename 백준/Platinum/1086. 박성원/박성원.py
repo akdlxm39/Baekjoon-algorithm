@@ -1,19 +1,18 @@
 import sys, math
 input = sys.stdin.readline
 
-def dfs(n, k, nums, tens, dp, cur, bitmask, cnt):
-    if cnt == n:
-        return cur == 0
-    if dp[bitmask][cur] != -1:
-        return dp[bitmask][cur]
-    dp[bitmask][cur] = 0
-    mask = 1
-    for i in range(n):
-        if not bitmask & mask:
-            nxt = (cur * tens[nums[i][1]] + nums[i][0]) % k
-            dp[bitmask][cur] += dfs(n, k, nums, tens, dp, nxt, bitmask|mask, cnt + 1)
-        mask <<= 1
-    return dp[bitmask][cur]
+def bottom_up(n, k, nums, tens):
+    dp = [[0]*k for _ in range(1<<n)]
+    dp[0][0] = 1
+    for mask in range(1<<n):
+        bit = 1
+        for num, length in nums:
+            if not mask & bit:
+                for cur in range(k):
+                    nxt = (cur*tens[length]+num)%k
+                    dp[mask|bit][nxt] += dp[mask][cur]
+            bit <<= 1
+    return dp[-1][0]
 
 def main():
     n = int(input())
@@ -29,11 +28,10 @@ def main():
     tens = [1] + [0] * 50
     for i in range(1, 51):
         tens[i] = tens[i-1] * 10 % k
-    dp = [[-1]*100 for _ in range(1<<n)]
-    p = dfs(n, k, nums, tens, dp, 0, 0, 0)
-    Max = math.factorial(n)
-    gcd = math.gcd(p, Max)
-    print(f"{p//gcd}/{Max//gcd}")
+    p = bottom_up(n, k, nums, tens)
+    p_all = math.factorial(n)
+    gcd = math.gcd(p, p_all)
+    print(f"{p//gcd}/{p_all//gcd}")
 
 if __name__ == "__main__":
     main()
