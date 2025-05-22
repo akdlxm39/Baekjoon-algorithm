@@ -2,13 +2,12 @@ import sys
 input = sys.stdin.readline
 
 def pipelining(c, map_, i, j):
-    if j == c-1:
-        return True
+    map_[i][j] = True
     nj = j + 1
+    if nj == c:
+        return True
     for ni in range(i-1, i+2):
-        if map_[ni][nj]: continue
-        map_[ni][nj] = True
-        if pipelining(c, map_, ni, nj):
+        if not map_[ni][nj] and pipelining(c, map_, ni, nj):
             return True
     return False
 
@@ -20,9 +19,8 @@ def main():
         map_.append(line)
     map_.append([True]*c)
     ans = 0
-    for i in range(r):
+    for i in range(1, r+1):
         if pipelining(c, map_, i, 0):
-            map_[i][0] = True
             ans += 1
     print(ans)
 if __name__ == "__main__":
