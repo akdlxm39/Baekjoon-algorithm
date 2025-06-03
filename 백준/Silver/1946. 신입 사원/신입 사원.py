@@ -5,13 +5,16 @@ def main():
     t = int(input())
     for _ in range(t):
         n = int(input())
-        candidates = sorted(tuple(map(int, input().split())) for _ in range(n))
-        high = candidates[0][1]
+        ranks = [0]*(n+1)
+        for _ in range(n):
+            a, b = map(int, input().split())
+            ranks[a] = b
+        high = ranks[1]
         ans = 1
-        for _, x in candidates[1:]:
-            if x < high:
+        for rank in ranks[2:]:
+            if rank < high:
                 ans += 1
-                high = x
+                high = rank
         print(ans)
 
 if __name__ == "__main__":
