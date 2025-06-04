@@ -5,12 +5,12 @@ input = sys.stdin.readline
 def eat(n, bamboos, memo, x, y):
     if memo[x][y]:
         return memo[x][y]
-    res = 0
+    res = [0]
     for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
         nx, ny = x+dx, y+dy
         if bamboos[nx][ny] > bamboos[x][y]:
-            res = max(res, eat(n, bamboos, memo, nx, ny))
-    memo[x][y] = res+1
+            res.append(eat(n, bamboos, memo, nx, ny))
+    memo[x][y] = max(res)+1
     return memo[x][y]
 
 def main():
