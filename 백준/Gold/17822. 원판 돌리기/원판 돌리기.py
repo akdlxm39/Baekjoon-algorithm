@@ -9,38 +9,31 @@ def rotate(n, disks, x, d, k):
         disks[xi] = disks[xi][k:] + disks[xi][:k]
 
 def erase(n, m, disks, info):
-    visited = [[False] * m for _ in range(n)]
-    does_erase = False
+    queue = set()
     for i in range(n):
         for j in range(m):
-            if visited[i][j]: continue
-            visited[i][j] = True
-            num = disks[i][j]
-            if num == 0: continue
-            queue = [(i, j)]
-            size = 1
-            pivot = 0
-            while pivot < size:
-                x, y = queue[pivot]
-                for dx, dy in dxdy:
-                    nx, ny = x + dx, (y + dy) % m
-                    if not(0<=nx<n) or visited[nx][ny] or disks[nx][ny] != num: continue
-                    visited[nx][ny] = True
-                    queue.append((nx, ny))
-                    size += 1
-                pivot += 1
-            if size > 1:
-                does_erase = True
-                info[0] -= size
-                info[1] -= size*num
-                for x, y in queue:
-                    disks[x][y] = 0
-    return does_erase
+            nj = (j + 1) % m
+            if disks[i][j] != 0 and disks[i][j] == disks[i][nj]:
+                queue.add((i, j))
+                queue.add((i, nj))
+    for i in range(n-1):
+        for j in range(m):
+            ni = i + 1
+            if disks[i][j] != 0 and disks[i][j] == disks[ni][j]:
+                queue.add((i, j))
+                queue.add((ni, j))
+    if queue:
+        for x, y in queue:
+            info[1] -= disks[x][y]
+            disks[x][y] = 0
+        info[0] -= len(queue)
+        return True
+    return False
 
 def convert(n, m, disks, info):
-    if erase(n, m, disks, info):
-        return
     if info[0] == 0:
+        return
+    if erase(n, m, disks, info):
         return
     mean = info[1]/info[0]
     for i in range(n):
