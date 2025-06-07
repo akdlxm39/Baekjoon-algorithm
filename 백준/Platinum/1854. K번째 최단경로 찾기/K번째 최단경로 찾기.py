@@ -15,17 +15,12 @@ def main():
         cur_dist, cur = heappop(heap)
         if count[cur] == k: continue
         count[cur] += 1
-        dist[cur] = cur_dist
-        for nxt, nxt_cost in adj_list[cur]:
-            if count[nxt] == k: continue
-            nxt_dist = cur_dist + nxt_cost
-            heappush(heap, (nxt_dist, nxt))
+        if count[cur] == k: dist[cur] = cur_dist
+        for i in range(len(adj_list[cur])):
+            if count[adj_list[cur][i][0]] < k:
+                heappush(heap, (cur_dist + adj_list[cur][i][1], adj_list[cur][i][0]))
 
-    for i in range(1, n+1):
-        if count[i] == k:
-            print(dist[i])
-        else:
-            print(-1)
+    print('\n'.join(map(str, (dist[i] for i in range(1, n+1)))))
 
 if __name__ == "__main__":
     main()
