@@ -3,8 +3,9 @@ input = sys.stdin.readline
 
 def main():
     n = int(input())
-    nums = sorted((int(input()), i) for i in range(n))
-    ans = max(j-i for i, (_, j) in enumerate(nums))+1
+    nums = [int(input()) for _ in range(n)]
+    sort_idx = sorted(range(n), key=lambda i: nums[i])
+    ans = max(j-i for i, j in enumerate(sort_idx))+1
     print(ans)
 
 if __name__ == "__main__":
