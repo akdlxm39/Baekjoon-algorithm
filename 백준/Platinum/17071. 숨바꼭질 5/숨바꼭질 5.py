@@ -3,25 +3,25 @@ input = sys.stdin.readline
 
 def main():
     n, k = map(int, input().split())
-    dk, time, is_odd = 1, 0, 0
+    if n == k:
+        print(0)
+        return
+    dk, time, is_odd = 2, 1, 1
+    k += 1
     queue = [n]
-    visited = [[-1, -1] for _ in range(500001)]
-    visited[n][0] = 0
-    while queue:
-        if visited[k][is_odd] != -1:
-            print(time)
-            break
-        is_odd = 1-is_odd
+    visited = [[0]*500001 for _ in range(2)]
+    while k <= 500000:
         nxt_queue = []
         for cur in queue:
             for nxt in [cur-1, cur+1, cur*2]:
-                if not (0<=nxt<=500000) or visited[nxt][is_odd] != -1: continue
-                visited[nxt][is_odd] = time
+                if not (0<=nxt<=500000) or visited[is_odd][nxt]: continue
+                visited[is_odd][nxt] = time
                 nxt_queue.append(nxt)
-        k += dk
-        if k > 500000:
-            print(-1)
+        if visited[is_odd][k]:
+            print(time)
             break
+        k += dk
+        is_odd = 1 - is_odd
         dk += 1
         time += 1
         queue = nxt_queue
