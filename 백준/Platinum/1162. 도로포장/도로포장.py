@@ -1,7 +1,7 @@
 import sys
 from heapq import heappush, heappop
 input = sys.stdin.readline
-INF = int(1e11)
+INF = int(1e10)
 
 def main():
     n, m, k = map(int, input().split())
@@ -11,7 +11,7 @@ def main():
         roads[u].append((v, cost))
         roads[v].append((u, cost))
     dists = [[INF]*(n+1) for _ in range(k+1)]
-    heap = [(0, 0, 1)] # total_cost, used, node
+    heap = [(0, k, 1)] # total_cost, used, node
     while heap:
         dist, used, cur = heappop(heap)
         if dist > dists[used][cur]: continue
@@ -21,9 +21,9 @@ def main():
             if dists[used][nxt] > nxt_dist:
                 dists[used][nxt] = nxt_dist
                 heappush(heap, (nxt_dist, used, nxt))
-            if used < k and dists[used+1][nxt] > dist:
-                dists[used+1][nxt] = dist
-                heappush(heap, (dist, used+1, nxt))
+            if used > 0 and dists[used-1][nxt] > dist:
+                dists[used-1][nxt] = dist
+                heappush(heap, (dist, used-1, nxt))
 
 if __name__ == "__main__":
     main()
