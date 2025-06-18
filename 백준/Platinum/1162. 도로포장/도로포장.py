@@ -10,15 +10,13 @@ def main():
         u, v, cost = map(int, input().split())
         roads[u].append((v, cost))
         roads[v].append((u, cost))
-    costs = [[INF]*(k+1) for _ in range(n+1)]
     visited = [k+1]*(n+1)
     heap = [(0, 0, 1)] # total_cost, used, node
     while heap:
         cost, used, cur = heappop(heap)
-        if cur == n: print(cost) ; break
         if used >= visited[cur]: continue
+        if cur == n: print(cost) ; break
         visited[cur] = used
-        costs[cur][used] = cost
         for nxt, nxt_cost in roads[cur]:
             if visited[nxt] > used:
                 heappush(heap, (cost+nxt_cost, used, nxt))
