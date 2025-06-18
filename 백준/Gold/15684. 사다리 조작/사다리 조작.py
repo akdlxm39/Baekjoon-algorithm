@@ -2,17 +2,18 @@ import sys
 input = sys.stdin.readline
 
 def check(n, h, ladder):
-    for i in range(n-1):
+    same = 0
+    for i in range(n):
         cur = i
         for j in range(h):
             cur = ladder[j][cur]
-        if cur != i:
-            return False
-    return True
+        if cur == i: same += 1
+    return same
 
 def bruteforce(n, h, ladder, cross_cnt, cur):
-    if cross_cnt == 0:
-        return check(n, h, ladder)
+    same = check(n, h, ladder)
+    if same < n-cross_cnt*2: return False
+    if cross_cnt == 0: return same == n
     for nxt in range(cur, (n-1)*h):
         x, y = nxt//h, nxt%h
         if ladder[y][x]==x and ladder[y][x+1]==x+1:
