@@ -1,5 +1,4 @@
 import sys
-from heapq import heapify, heappop
 sys.setrecursionlimit(int(1e7))
 input = sys.stdin.readline
 
@@ -17,19 +16,20 @@ def union(root, a, b):
 
 def main():
     v, e = map(int, input().split())
-    heap = []
+    edges = []
     for _ in range(e):
         a, b, w = map(int, input().split())
-        heap.append((w, a-1, b-1))
-    heapify(heap)
+        edges.append((w, a-1, b-1))
+    edges.sort()
     root = list(range(v))
     total = 0
     need = v-1
-    while heap and need:
-        w, a, b = heappop(heap)
+    for w, a, b in edges:
         if union(root, a, b):
             total += w
             need -= 1
+            if need == 0:
+                break
     print(total)
 
 if __name__ == "__main__":
