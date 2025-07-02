@@ -1,5 +1,4 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
 INF = int(1e9)
 
@@ -19,16 +18,16 @@ def bellman_ford(n, revenues, profits):
 
 def check(n, edges, cycle_list, dest):
     visited = [False] * n
-    queue = deque(cycle_list)
     for cur in cycle_list:
-        visited[cur] = True
-    while queue:
-        cur = queue.popleft()
         if cur == dest: return True
+        visited[cur] = True
+    while cycle_list:
+        cur = cycle_list.pop()
         for nxt in edges[cur]:
             if visited[nxt]: continue
+            if nxt == dest: return True
             visited[nxt] = True
-            queue.append(nxt)
+            cycle_list.append(nxt)
     return False
 
 def main():
