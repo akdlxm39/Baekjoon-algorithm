@@ -1,23 +1,20 @@
 import sys
 from collections import deque
-
 input = sys.stdin.readline
 INF = int(1e9)
 
-def bellman_ford(n, edges, profits, dest):
-    cycle_list = []
+def bellman_ford(n, revenues, profits):
     for _ in range(n-1):
-        for cur in range(n):
-            for nxt, earned in edges[cur].items():
-                nxt_profit = profits[cur] + earned
-                if profits[cur] != -INF and profits[nxt] < nxt_profit:
-                    profits[nxt] = nxt_profit
-    for cur in range(n):
-        for nxt, earned in edges[cur].items():
+        for cur, nxt, earned in revenues:
             nxt_profit = profits[cur] + earned
             if profits[cur] != -INF and profits[nxt] < nxt_profit:
                 profits[nxt] = nxt_profit
-                cycle_list.append(nxt)
+    cycle_list = []
+    for cur, nxt, earned in revenues:
+        nxt_profit = profits[cur] + earned
+        if profits[cur] != -INF and profits[nxt] < nxt_profit:
+            profits[nxt] = nxt_profit
+            cycle_list.append(nxt)
     return cycle_list
 
 def check(n, edges, cycle_list, dest):
@@ -27,28 +24,24 @@ def check(n, edges, cycle_list, dest):
         visited[cur] = True
     while queue:
         cur = queue.popleft()
-        for nxt in edges[cur].keys():
+        if cur == dest: return True
+        for nxt in edges[cur]:
             if visited[nxt]: continue
             visited[nxt] = True
             queue.append(nxt)
-    return visited[dest]
+    return False
 
 def main():
     n, s, d, m = map(int, input().split())
-    edges = [{} for _ in range(n)]
-    for _ in range(m):
-        u, v, cost = map(int, input().split())
-        if v in edges[u]:
-            edges[u][v] = max(edges[u][v], -cost)
-        else:
-            edges[u][v] = -cost
-    revenues = list(map(int, input().split()))
-    for cur in range(n):
-        for nxt in edges[cur].keys():
-            edges[cur][nxt] += revenues[nxt]
+    revenues = [list(map(int, input().split())) for _ in range(m)]
+    moneys = list(map(int, input().split()))
+    edges = [[] for _ in range(n)]
+    for i in range(m):
+        revenues[i][2] = moneys[revenues[i][1]] - revenues[i][2]
+        edges[revenues[i][0]].append(revenues[i][1])
     profits = [-INF] * n
-    profits[s] = revenues[s]
-    cycle_list = bellman_ford(n, edges, profits, d)
+    profits[s] = moneys[s]
+    cycle_list = bellman_ford(n, revenues, profits)
     if profits[d] == -INF:
         print("gg")
     elif cycle_list and check(n, edges, cycle_list, d):
