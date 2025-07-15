@@ -14,14 +14,15 @@ def bfs(n, arr, snum, enum):
             if not (0 <= nx < n and 0 <= ny < n) or visited[nx][ny]: continue
             visited[nx][ny] = True
             if snum <= arr[nx][ny] <= enum:
+                if nx == n - 1 and ny == n - 1: return True
                 queue.append((nx, ny))
-    return visited[-1][-1]
+    return False
 
 def main():
     n = int(input())
     arr = [list(map(int, input().split())) for _ in range(n)]
     start_num, end_num = min(arr[0][0], arr[-1][-1]), max(arr[0][0], arr[-1][-1])
-    left, right = end_num - start_num, 200
+    left, right = 0, 200
     while left < right:
         mid = (left + right) // 2
         for snum in range(max(end_num - mid, 0), start_num + 1):
