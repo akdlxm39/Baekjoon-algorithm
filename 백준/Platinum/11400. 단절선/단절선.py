@@ -30,9 +30,7 @@ def main():
         adj_list[b].append(a)
     visited = [0] * (v + 1)
     ans = set()
-    for i in range(1, v+1):
-        if not visited[i]:
-            dfs(adj_list, visited, 1, 0, 1, ans)
+    dfs(adj_list, visited, 1, 0, 1, ans)
     print(len(ans))
     if len(ans):
         print('\n'.join(map(lambda x: ' '.join(map(str, x)), sorted(ans))))
