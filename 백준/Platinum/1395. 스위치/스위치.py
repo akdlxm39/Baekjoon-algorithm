@@ -23,20 +23,18 @@ def lazy_update(tree, lazy, node, length):
 def update(tree, lazy, node, left, right, start, end):
     length = right - left + 1
     lazy_update(tree, lazy, node, length)
-    before = tree[node]
     if right < start or end < left:
-        return 0
+        return
     if start <= left and right <= end:
         tree[node] = length - tree[node]
         if left < right:
             lazy[node * 2] = not lazy[node * 2]
             lazy[node * 2 + 1] = not lazy[node * 2 + 1]
-        return tree[node] - before
     else:
         mid = (left + right) // 2
-        tree[node] += update(tree, lazy, node * 2, left, mid, start, end)
-        tree[node] += update(tree, lazy, node * 2 + 1, mid + 1, right, start, end)
-        return tree[node] - before
+        update(tree, lazy, node * 2, left, mid, start, end)
+        update(tree, lazy, node * 2 + 1, mid + 1, right, start, end)
+        tree[node] = tree[node * 2] + tree[node * 2 + 1]
 
 
 def range_sum(tree, lazy, node, left, right, start, end):
