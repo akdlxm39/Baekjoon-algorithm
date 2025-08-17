@@ -1,5 +1,4 @@
 import sys
-from collections import deque
 
 input = sys.stdin.readline
 dx, dy = [0, 0, 1, -1], [1, -1, 0, 0]
@@ -14,9 +13,10 @@ def move(board, x, y, dx_, dy_):
     return cnt, x, y
 
 
-def bfs(board, start):
-    queue = [start]
-    visited = {start}
+def bfs(n, m, board, rx, ry, bx, by):
+    queue = [(rx, ry, bx, by)]
+    visited = [[[[False]*m for _ in range(n)] for _ in range(m)] for _ in range(n)]
+    visited[rx][ry][bx][by] = True
     for _ in range(10):
         nxt_queue = []
         for rx, ry, bx, by in queue:
@@ -32,10 +32,9 @@ def bfs(board, start):
                     else:
                         bnx -= dx[i]
                         bny -= dy[i]
-                nxt = (rnx, rny, bnx, bny)
-                if nxt in visited: continue
-                nxt_queue.append(nxt)
-                visited.add(nxt)
+                if visited[rnx][rny][bnx][bny]: continue
+                nxt_queue.append((rnx, rny, bnx, bny))
+                visited[rnx][rny][bnx][bny] = True
         queue = nxt_queue
     return 0
 
@@ -49,7 +48,7 @@ def main():
             start[0], start[1] = i, board[i].index('R')
         if 'B' in board[i]:
             start[2], start[3] = i, board[i].index('B')
-    print(bfs(board, tuple(start)))
+    print(bfs(n, m, board, *start))
 
 
 if __name__ == "__main__":
