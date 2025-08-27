@@ -3,6 +3,19 @@ import sys
 input = sys.stdin.readline
 
 
+def init_2d(n, tree_2d):
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            j2 = j + (j & -j)
+            if j2 <= n:
+                tree_2d[i][j2] += tree_2d[i][j]
+    for j in range(1, n + 1):
+        for i in range(1, n + 1):
+            i2 = i + (i & -i)
+            if i2 <= n:
+                tree_2d[i2][j] += tree_2d[i][j]
+
+
 def update_2d(n, tree_2d, x, y, delta):
     while x <= n:
         cy = y
@@ -33,23 +46,17 @@ def range_sum_2d(tree_2d, x1, y1, x2, y2):
 
 def main():
     n, m = map(int, input().split())
-    nums_2d = [[]]
-    tree_2d = [[0] * (n + 1) for _ in range(n + 1)]
-    for i in range(1, n + 1):
-        tmp = [0] + list(map(int, input().split()))
-        for j in range(1, n + 1):
-            update_2d(n, tree_2d, i, j, tmp[j])
-        nums_2d.append(tmp)
+    nums_2d = [[0] * (n + 1)] + [[0] + list(map(int, input().split())) for _ in range(n)]
+    tree_2d = [nums_2d[i][:] for i in range(n + 1)]
+    init_2d(n, tree_2d)
     ans = []
     for _ in range(m):
-        w, *command = map(int, input().split())
+        w, a, b, c, *d = map(int, input().split())
         if w == 0:
-            a, b, c = command
             update_2d(n, tree_2d, a, b, c - nums_2d[a][b])
             nums_2d[a][b] = c
         else:
-            x1, y1, x2, y2 = command
-            ans.append(range_sum_2d(tree_2d, x1, y1, x2, y2))
+            ans.append(range_sum_2d(tree_2d, a, b, c, d[0]))
 
     print('\n'.join(map(str, ans)))
 
