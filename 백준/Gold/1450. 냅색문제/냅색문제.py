@@ -17,9 +17,6 @@ def main():
     n, c = map(int, input().split())
     weights = [x for x in map(int, input().split()) if x <= c]
     cnt = len(weights)
-    if cnt < 2:
-        print(cnt + 1)
-        return
     left_sub, right_sub = weights[:cnt // 2], weights[cnt // 2:]
     left_sum, right_sum = all_kind_sum(left_sub), all_kind_sum(right_sub)
     right_sum.sort()
