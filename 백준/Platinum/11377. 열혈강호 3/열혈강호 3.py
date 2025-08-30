@@ -5,10 +5,16 @@ input = sys.stdin.readline
 
 def assign(can_work, assigned, visited, cur):
     for work in can_work[cur]:
+        if assigned[work] == -1:
+            assigned[work] = cur
+            return True
+            
+    for work in can_work[cur]:
         if visited[work]: continue
         visited[work] = True
-        if assigned[work] == -1 or assign(can_work, assigned, visited, assigned[work]):
+        if  assign(can_work, assigned, visited, assigned[work]):
             assigned[work] = cur
+            visited[work] = False
             return True
     return False
 
@@ -22,12 +28,11 @@ def main():
             can_work[i] += works
     assigned = [-1] * (m + 1)
     ans = 0
+    visited = [False] * (m + 1)
     for i in range(1, n + 1):
-        visited = [False] * (m + 1)
         if assign(can_work, assigned, visited, i):
             ans += 1
     for i in range(1, n + 1):
-        visited = [False] * (m + 1)
         if assign(can_work, assigned, visited, i):
             ans += 1
             k -= 1
