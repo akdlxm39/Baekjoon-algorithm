@@ -12,6 +12,7 @@ def assign(staff2work, assignment, visited, staff):
         visited[work] = True
         if assign(staff2work, assignment, visited, assignment[work]):
             assignment[work] = staff
+            visited[work] = False
             return True
     return False
 
@@ -23,8 +24,8 @@ def main():
         staff2work[i] = works
     assignment = [-1] * m
     ans = 0
+    visited = [False] * m
     for staff in range(n):
-        visited = [False] * m
         if assign(staff2work, assignment, visited, staff):
             ans += 1
     print(ans)
