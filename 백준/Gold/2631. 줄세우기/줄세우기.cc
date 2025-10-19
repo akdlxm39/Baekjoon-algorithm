@@ -4,13 +4,11 @@ using namespace std;
 
 typedef long long ll;
 
-int n;
+int n, x;
 vector<int> arr;
 
 void solve() {
-    cin >> n;
-    int x;
-    cin >> x;
+    cin >> n >> x;
     arr.push_back(x);
     for (int i = 1; i < n; i++) {
         cin >> x;
