@@ -5,7 +5,7 @@ using namespace std;
 typedef long long ll;
 
 const ll MOD[3] = {15, 28, 19}, MOD_ESM = 15 * 28 * 19;
-ll nums[3], ans, esm = 1;
+ll a, ans;
 
 tuple<ll, ll, ll> extended_euclidean(ll a, ll b) {
     if (b == 0)
@@ -17,16 +17,13 @@ tuple<ll, ll, ll> extended_euclidean(ll a, ll b) {
 
 void solve() {
     for (int i = 0; i < 3; i++) {
-        cin >> nums[i];
-        esm *= nums[i];
-    }
-    for (int i = 0; i < 3; i++) {
+        cin >> a;
         auto [g, x, y] = extended_euclidean(MOD_ESM / MOD[i], MOD[i]);
-        while (x < y)
-            x += MOD[i] / g;
-        ans += MOD_ESM / MOD[i] * x * nums[i];
+        ans += MOD_ESM / MOD[i] * x * a;
     }
-    cout << (ans - 1) % MOD_ESM + 1 << '\n';
+    ans = ans - (ans / MOD_ESM - 1) * MOD_ESM;
+    ans = (ans - 1) % MOD_ESM + 1;
+    cout << ans << '\n';
 }
 
 
