@@ -19,14 +19,17 @@ void solve() {
     expr = "0+0+" + expr;
     for (int i = 4, di = 2; i < n; i += 2, di++) {
         ll cur = expr[i] - '0';
-        char op1 = expr[i - 1];
-        ll prev = expr[i - 2] - '0';
-        char op2 = expr[i - 3];
-        ll cur_prev = oper(prev, cur, op1);
-        dp[di][0] = max(max(oper(dp[di - 1][0], cur, op1), oper(dp[di - 1][1], cur, op1)),
-                        max(oper(dp[di - 2][0], cur_prev, op2), oper(dp[di - 2][1], cur_prev, op2)));
-        dp[di][1] = min(min(oper(dp[di - 1][0], cur, op1), oper(dp[di - 1][1], cur, op1)),
-                        min(oper(dp[di - 2][0], cur_prev, op2), oper(dp[di - 2][1], cur_prev, op2)));
+        char op = expr[i - 1];
+        ll nums[2] = {cur, oper(expr[i - 2] - '0', cur, op)};
+        char ops[2] = {op, expr[i - 3]};
+        dp[di][0] = -INT32_MAX;
+        dp[di][1] = INT32_MAX;
+        for (int a = 0; a < 2; a++)
+            for (int b = 0; b < 2; b++) {
+                ll num = oper(dp[di - 1 - a][b], nums[a], ops[a]);
+                dp[di][0] = max(dp[di][0], num);
+                dp[di][1] = min(dp[di][1], num);
+            }
     }
     // for (auto x: dp)
     //     cout << x[0] << ' ' << x[1] << endl;
