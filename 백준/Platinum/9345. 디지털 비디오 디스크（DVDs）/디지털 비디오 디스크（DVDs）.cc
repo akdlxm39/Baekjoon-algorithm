@@ -6,41 +6,42 @@ const int MAX = 100'001;
 
 
 int n, k;
-int tree[MAX * 4], dvds[MAX];
-int prefix_sum[MAX];
+int min_tree[MAX * 4], max_tree[MAX * 4], dvds[MAX];
 
-void make_prefix_sum() {
-    for (int i = 1; i < MAX; i++)
-        prefix_sum[i] = prefix_sum[i - 1] + i;
-}
 
 void init(int node, int left, int right) {
     if (left == right) {
-        tree[node] = dvds[left] = left;
+        min_tree[node] = max_tree[node] = dvds[left] = left;
         return;
     }
     int mid = (left + right) / 2;
     init(node * 2, left, mid);
     init(node * 2 + 1, mid + 1, right);
-    tree[node] = tree[node * 2] + tree[node * 2 + 1];
+    min_tree[node] = min(min_tree[node * 2], min_tree[node * 2 + 1]);
+    max_tree[node] = max(max_tree[node * 2], max_tree[node * 2 + 1]);
 }
 
-void update(int node, int left, int right, int idx, int delta) {
-    tree[node] += delta;
-    if (left == right) return;
+void update(int node, int left, int right, int idx, int key) {
+    if (left == right) {
+        min_tree[node] = max_tree[node] = key;
+        return;
+    }
     int mid = (left + right) / 2;
     if (idx <= mid)
-        update(node * 2, left, mid, idx, delta);
+        update(node * 2, left, mid, idx, key);
     else
-        update(node * 2 + 1, mid + 1, right, idx, delta);
+        update(node * 2 + 1, mid + 1, right, idx, key);
+    min_tree[node] = min(min_tree[node * 2], min_tree[node * 2 + 1]);
+    max_tree[node] = max(max_tree[node * 2], max_tree[node * 2 + 1]);
 }
 
-int query(int node, int left, int right, int start, int end) {
-    if (right < start || end < left) return 0;
-    if (start <= left && right <= end) return tree[node];
+tuple<int, int> query(int node, int left, int right, int start, int end) {
+    if (right < start || end < left) return {MAX, 0};
+    if (start <= left && right <= end) return {min_tree[node], max_tree[node]};
     int mid = (left + right) / 2;
-    return query(node * 2, left, mid, start, end) +
-           query(node * 2 + 1, mid + 1, right, start, end);
+    auto [min_l, max_l] = query(node * 2, left, mid, start, end);
+    auto [min_r, max_r] = query(node * 2 + 1, mid + 1, right, start, end);
+    return {min(min_l, min_r), max(max_l, max_r)};
 }
 
 
@@ -50,23 +51,12 @@ void solve() {
     for (int i = 0, q, a, b; i < k; i++) {
         cin >> q >> a >> b;
         if (q == 0) {
-            int delta = dvds[b] - dvds[a];
-            update(1, 0, n - 1, a, delta);
-            update(1, 0, n - 1, b, -delta);
+            update(1, 0, n - 1, a, dvds[b]);
+            update(1, 0, n - 1, b, dvds[a]);
             swap(dvds[a], dvds[b]);
         } else {
-            int true_sum = a != 0 ? prefix_sum[b] - prefix_sum[a - 1] : prefix_sum[b];
-            if (true_sum == query(1, 0, n - 1, a, b)) {
-                int j = a;
-                for (; j <= b; ++j) {
-                    if (dvds[j] < a || b < dvds[j]) {
-                        cout << "NO\n";
-                        break;
-                    }
-                }
-                if (j > b) cout << "YES\n";
-            } else
-                cout << "NO\n";
+            auto [l, r] = query(1, 0, n - 1, a, b);
+            cout << (l == a && r == b ? "YES\n" : "NO\n");
         }
     }
 }
@@ -74,7 +64,6 @@ void solve() {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    make_prefix_sum();
     int t = 1;
     cin >> t;
     while (t--)
