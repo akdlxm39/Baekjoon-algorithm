@@ -4,39 +4,31 @@ using namespace std;
 
 const int MAX = 10001, INF = 1000000000;
 
-vector<pair<int, int> > graph[MAX];
-int max_weight[MAX];
+vector<tuple<int, int, int> > bridges;
+int root[MAX];
 int n, m;
 
-int dijkstra(int s, int t) {
-    priority_queue<pair<int, int> > pq;
-    pq.emplace(INF, s);
-    max_weight[s] = INF;
-    while (!pq.empty()) {
-        auto [cur_w, cur] = pq.top();
-        pq.pop();
-        if (cur_w < max_weight[cur]) continue;
-        for (auto [nxt, cap]: graph[cur]) {
-            int nxt_w = min(cur_w, cap);
-            if (max_weight[nxt] < nxt_w) {
-                max_weight[nxt] = nxt_w;
-                pq.emplace(nxt_w, nxt);
-            }
-        }
-    }
-    return max_weight[t];
-}
+int find(int x) { return x == root[x] ? x : root[x] = find(root[x]); }
+void union_(int u, int v) { root[find(u)] = find(v); }
 
 void solve() {
     cin >> n >> m;
     for (int i = 0, u, v, w; i < m; ++i) {
         cin >> u >> v >> w;
-        graph[u].emplace_back(v, w);
-        graph[v].emplace_back(u, w);
+        bridges.emplace_back(w, u, v);
     }
-    int s, t;
+
+    sort(bridges.rbegin(), bridges.rend());
+    for (int i = 1; i <= n; ++i) root[i] = i;
+    int s, t, ans = 0;
     cin >> s >> t;
-    cout << dijkstra(s, t) << '\n';
+    for (auto &[w, u, v]: bridges) {
+        union_(u, v);
+        if (find(s) == find(t)) {
+            cout << w << '\n';
+            break;
+        }
+    }
 }
 
 
