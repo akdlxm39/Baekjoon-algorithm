@@ -2,29 +2,25 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int MAX = 10001, INF = 1000000007;
+const int MAX = 10001, INF = 1000000000;
 
 vector<pair<int, int> > graph[MAX];
 int max_weight[MAX];
-bool in_queue[MAX];
 int n, m;
 
-int spfa(int s, int t) {
-    queue<int> q;
-    q.push(s);
-    in_queue[s] = true;
+int dijkstra(int s, int t) {
+    priority_queue<pair<int, int> > pq;
+    pq.emplace(INF, s);
     max_weight[s] = INF;
-    while (!q.empty()) {
-        int cur = q.front();
-        q.pop();
-        in_queue[cur] = false;
+    while (!pq.empty()) {
+        auto [cur_w, cur] = pq.top();
+        pq.pop();
+        if (cur_w < max_weight[cur]) continue;
         for (auto [nxt, cap]: graph[cur]) {
-            if (max_weight[nxt] < min(max_weight[cur], cap)) {
-                max_weight[nxt] = min(max_weight[cur], cap);
-                if (!in_queue[nxt]) {
-                    q.push(nxt);
-                    in_queue[nxt] = true;
-                }
+            int nxt_w = min(cur_w, cap);
+            if (max_weight[nxt] < nxt_w) {
+                max_weight[nxt] = nxt_w;
+                pq.emplace(nxt_w, nxt);
             }
         }
     }
@@ -40,7 +36,7 @@ void solve() {
     }
     int s, t;
     cin >> s >> t;
-    cout << spfa(s, t) << '\n';
+    cout << dijkstra(s, t) << '\n';
 }
 
 
