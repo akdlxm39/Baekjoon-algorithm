@@ -29,9 +29,9 @@ void solve() {
     sort(nums.begin(), nums.end(), cmp);
     string ans;
     for (auto [x, cnt]: nums) {
-        while (cnt--) ans += x;
+        while (cnt--) cout << x;
     }
-    cout << ans << '\n';
+    cout << '\n';
 }
 
 
