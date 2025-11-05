@@ -17,12 +17,8 @@ void solve() {
     for (int i = 0; i < n; ++i) {
         int v, c, k;
         cin >> v >> c >> k;
-        int x = 1;
-        while (x < k) {
+        for (int x = 1; x < k; k -= x, x *= 2)
             items.push_back({v * x, c * x});
-            k -= x;
-            x *= 2;
-        }
         items.push_back({v * k, c * k});
     }
     sort(items.begin(), items.end(), cmp);
