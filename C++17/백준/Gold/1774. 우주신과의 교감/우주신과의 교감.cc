@@ -28,13 +28,10 @@ bool union_(int a, int b) {
 
 void solve() {
     cin >> n >> m;
-    rest = n - 1;
-    for (int i = 1; i <= n; ++i) {
+    for (int i = 1; i <= n; ++i)
         cin >> member[i][0] >> member[i][1];
-        for (int j = 1; j < i; ++j) {
-            adj.emplace_back(dist(member[i], member[j]), i, j);
-        }
-    }
+
+    rest = n - 1;
     for (int i = 1; i <= n; ++i)
         root[i] = i;
     while (m--) {
@@ -42,11 +39,16 @@ void solve() {
         cin >> a >> b;
         rest -= union_(a, b);
     }
-    sort(adj.begin(), adj.end());
-    for (auto &[d, a, b]: adj) {
-        if (union_(a, b)) {
-            ans += d;
-            if (--rest == 0) break;
+    if (rest != 0) {
+        for (int i = 1; i <= n; ++i)
+            for (int j = 1; j < i; ++j)
+                adj.emplace_back(dist(member[i], member[j]), i, j);
+        sort(adj.begin(), adj.end());
+        for (auto &[d, a, b]: adj) {
+            if (union_(a, b)) {
+                ans += d;
+                if (--rest == 0) break;
+            }
         }
     }
     cout << ans << '\n';
