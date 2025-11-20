@@ -4,7 +4,7 @@ using namespace std;
 
 const int MAX = 200001;
 
-int n, m, root[MAX], ans;
+int n, m, root[MAX], ans, cnt;
 vector<array<int, 3> > edges;
 
 int find(int x) {
@@ -16,7 +16,8 @@ bool union_(int a, int b) {
     a = find(a);
     b = find(b);
     if (a == b) return false;
-    root[a] = b;
+    if (a > b) root[a] = b;
+    else root[b] = a;
     return true;
 }
 
@@ -25,17 +26,20 @@ bool solve() {
     cin >> n >> m;
     if (n == 0 && m == 0) return false;
     edges.resize(m);
-    ans = 0;
+    ans = cnt = 0;
     for (int i = 0; i < n; ++i)
         root[i] = i;
     for (auto &[z, x, y]: edges) {
         cin >> x >> y >> z;
         ans += z;
     }
-    sort(edges.begin(), edges.end());
+    sort(edges.begin(), edges.end(), [](const array<int, 3> &a, const array<int, 3> &b) { return a[0] < b[0]; });
     for (auto &[z, x, y]: edges)
-        if (union_(x, y))
+        if (union_(x, y)) {
             ans -= z;
+            if (++cnt == n - 1)
+                break;
+        }
     cout << ans << '\n';
 
     return true;
@@ -44,8 +48,6 @@ bool solve() {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    // int t = 1;
-    // while (t--) solve();
     while (solve()) {
     }
     return 0;
