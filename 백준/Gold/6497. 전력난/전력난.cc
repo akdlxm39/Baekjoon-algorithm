@@ -22,9 +22,9 @@ bool union_(int a, int b) {
 
 
 bool solve() {
-    cin >> m >> n;
+    cin >> n >> m;
     if (n == 0 && m == 0) return false;
-    edges.resize(n);
+    edges.resize(m);
     ans = 0;
     for (int i = 0; i < n; ++i)
         root[i] = i;
