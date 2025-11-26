@@ -2,41 +2,30 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-struct SegmentTree {
+struct FenwickTree {
     vector<int> tree;
+    int size;
 
-    explicit SegmentTree() {
-        tree = vector<int>(4'200'000, 0);
+    explicit FenwickTree(int size) : tree(size + 1), size(size) { ; }
+
+    void append(int num, int delta = 1) {
+        for (; num <= size; num += num & -num)
+            tree[num] += delta;
     }
 
-    void append(int x) {
-        append(1, 1, 2'000'000, x);
+    int pop(int kth) {
+        int cur = 0;
+        for (int x = 20; x >= 0; --x) {
+            int nxt = cur + (1 << x);
+            if (nxt <= size && tree[nxt] < kth) {
+                kth -= tree[nxt];
+                cur = nxt;
+            }
+        }
+        append(++cur, -1);
+        return cur;
     }
-
-    void append(int node, int left, int right, int num) {
-        ++tree[node];
-        if (left == right) return;
-        int mid = (left + right) / 2;
-        if (left <= num && num <= mid)
-            append(node * 2, left, mid, num);
-        else
-            append(node * 2 + 1, mid + 1, right, num);
-    }
-
-    int pop(int x) {
-        return pop(1, 1, 2'000'000, x);
-    }
-
-    int pop(int node, int left, int right, int idx) {
-        --tree[node];
-        if (left == right)
-            return left;
-        if (idx <= tree[node * 2])
-            return pop(node * 2, left, (left + right) / 2, idx);
-        else
-            return pop(node * 2 + 1, (left + right) / 2 + 1, right, idx - tree[node * 2]);
-    }
-} segment_tree;
+} fenwick_tree(2'000'000);
 
 int n;
 
@@ -46,9 +35,9 @@ void solve() {
     while (n--) {
         cin >> t >> x;
         if (t == 1)
-            segment_tree.append(x);
+            fenwick_tree.append(x);
         else
-            cout << segment_tree.pop(x) << '\n';
+            cout << fenwick_tree.pop(x) << '\n';
     }
 }
 
