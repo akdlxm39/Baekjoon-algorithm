@@ -2,37 +2,24 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-struct Node {
-    int value = 0;
-    Node *left = nullptr, *right = nullptr;
-    Node(int v) : value(v) { ; }
+typedef vector<int>::iterator vi;
 
-    void push(Node *new_node) {
-        if (new_node->value < value) {
-            if (left == nullptr)
-                left = new_node;
-            else
-                left->push(new_node);
-        } else {
-            if (right == nullptr)
-                right = new_node;
-            else
-                right->push(new_node);
-        }
-    }
+vector<int> v, ans;
 
-    void show() {
-        if (left) left->show();
-        if (right) right->show();
-        cout << value << '\n';
-    }
-} root(0);
+void postorder(vi begin, vi end) {
+    if (begin >= end)
+        return;
+    vi middle = upper_bound(begin, end, *begin);
+    postorder(begin + 1, middle);
+    postorder(middle, end);
+    cout << *begin << '\n';
+}
 
 void solve() {
     int x;
     while (cin >> x)
-        root.push(new Node(x));
-    root.right->show();
+        v.push_back(x);
+    postorder(v.begin(), v.end());
 }
 
 
