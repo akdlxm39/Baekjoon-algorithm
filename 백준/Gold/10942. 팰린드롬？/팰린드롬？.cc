@@ -23,8 +23,7 @@ void solve() {
     cin >> m;
     while (m--) {
         cin >> s >> e;
-        int c = s + e - 1;
-        cout << (palindromeRadius[c] >= e - s ? "1\n" : "0\n");
+        cout << (palindromeRadius[s + e - 1] >= e - s ? "1\n" : "0\n");
     }
 }
 
