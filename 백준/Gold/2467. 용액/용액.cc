@@ -2,44 +2,21 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<int> acid, alcali;
-int n, x, ans = 2'000'000'001, a, b;
+vector<int> nums;
+int n, l, r, ans = 2'000'000'001, ans_l, ans_r;
 
 void solve() {
     cin >> n;
-    while (n--) {
+    nums.resize(n);
+    for (auto &x: nums)
         cin >> x;
-        if (x > 0)
-            acid.push_back(x);
-        else
-            alcali.push_back(x);
+    l = 0, r = n - 1;
+    while (l < r) {
+        if (ans > abs(nums[l] + nums[r]))
+            ans = abs((ans_l = nums[l]) + (ans_r = nums[r]));
+        nums[l] + nums[r] < 0 ? ++l : --r;
     }
-    sort(acid.begin(), acid.end());
-    sort(alcali.rbegin(), alcali.rend());
-    if (acid.size() >= 2 && ans > acid[0] + acid[1])
-        ans = (a = acid[0]) + (b = acid[1]);
-    if (alcali.size() >= 2 && ans > -alcali[0] - alcali[1])
-        ans = -(b = alcali[0]) - (a = alcali[1]);
-    auto acid_iter = acid.begin(), alcali_iter = alcali.begin();
-    while (acid_iter != acid.end() && alcali_iter != alcali.end()) {
-        int cur = *acid_iter + *alcali_iter;
-        if (cur > 0) {
-            if (ans > cur) {
-                ans = cur;
-                a = *alcali_iter;
-                b = *acid_iter;
-            }
-            ++alcali_iter;
-        } else {
-            if (ans > -cur) {
-                ans = -cur;
-                a = *alcali_iter;
-                b = *acid_iter;
-            }
-            ++acid_iter;
-        }
-    }
-    cout << a << ' ' << b << '\n';
+    cout << ans_l << ' ' << ans_r << '\n';
 }
 
 int main() {
