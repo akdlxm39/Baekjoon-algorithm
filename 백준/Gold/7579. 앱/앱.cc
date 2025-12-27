@@ -7,7 +7,7 @@ struct app {
     int cost;
 };
 
-int n, m, bytes, costs, ans = int(1e9);
+int n, m, bytes, costs;
 vector<app> apps;
 vector<int> dp;
 
@@ -26,10 +26,9 @@ void solve() {
     for (auto [byte, cost]: apps) {
         for (int i = costs; i >= cost; --i) {
             dp[i] = max(dp[i], dp[i - cost] + byte);
-            if (dp[i] >= m && ans > i)
-                ans = i;
         }
     }
+    int ans = distance(dp.begin(), lower_bound(dp.begin(), dp.end(), m));
     cout << ans << ' ';
 }
 
