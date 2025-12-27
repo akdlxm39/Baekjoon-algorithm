@@ -2,39 +2,23 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int INF = 16'000'007;
+const int INF = 100'000'007, MAX_V = 16, MAX_B = 65536;
 
-int n, weights[16][16], dp[16][65536], path[16][65536];
+int n, weights[MAX_V][MAX_V], dp[MAX_V][MAX_B], path[MAX_V][MAX_B];
 
-void minimum(int mask, int i) {
-    int min_value = INF, min_j = 0;
-    for (int j = 1; j < n; ++j) {
-        if (mask & (1 << j)) {
-            int m = weights[i][j] + dp[j][mask ^ (1 << j)];
-            if (min_value > m) {
-                min_value = m;
-                min_j = j;
-            }
+int travel(int cur, int mask) {
+    if (dp[cur][mask] != -1)
+        return dp[cur][mask];
+    dp[cur][mask] = INF;
+    for (int nxt = 1; nxt < n; ++nxt) {
+        if (mask & (1 << nxt)) continue;
+        int cost = travel(nxt, mask | (1 << nxt)) + weights[cur][nxt];
+        if (dp[cur][mask] > cost) {
+            dp[cur][mask] = cost;
+            path[cur][mask] = nxt;
         }
     }
-    dp[i][mask] = min_value;
-    path[i][mask] = min_j;
-}
-
-void travel() {
-    int bit_size = (int) pow(2, n);
-    for (int i = 1; i < n; ++i)
-        dp[i][0] = weights[i][0];
-    for (int k = 1; k < n; ++k) {
-        for (int mask = 1; mask < bit_size; ++mask) {
-            if (__builtin_popcount(mask) != k) continue;
-            for (int i = 1; i < n; ++i) {
-                if (!(mask & (1 << i)))
-                    minimum(mask, i);
-            }
-        }
-    }
-    minimum(bit_size - 2, 0);
+    return dp[cur][mask];
 }
 
 void solve() {
@@ -42,12 +26,15 @@ void solve() {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             cin >> weights[i][j];
-            if (weights[i][j] == 0 && i != j)
+            if (weights[i][j] == 0)
                 weights[i][j] = INF;
         }
     }
-    travel();
-    cout << dp[0][(int) pow(2, n) - 2] << '\n';
+    fill_n(dp[0], MAX_B * MAX_V, -1);
+    for (int i = 1; i < n; ++i) {
+        dp[i][(1 << n) - 1] = weights[i][0];
+    }
+    cout << travel(0, 1) << '\n';
 }
 
 int main() {
