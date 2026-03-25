@@ -17,31 +17,15 @@ void update(int idx, int num)
     int *iter = lower_bound(bucket[bIdx], bucket[bIdx + 1], arr[idx]);
     if (num > arr[idx])
     {
-        while (iter + 1 < bucket[bIdx + 1])
-        {
-            if (*(iter + 1) < num)
-            {
-                *iter = *(iter + 1);
-                ++iter;
-            }
-            else
-                break;
-        }
-        *iter = num;
+        int *pos = upper_bound(iter, bucket[bIdx + 1], num) - 1;
+        copy(iter + 1, pos + 1, iter);
+        *pos = num;
     }
     else if (num < arr[idx])
     {
-        while (iter - 1 >= bucket[bIdx])
-        {
-            if (*(iter - 1) > num)
-            {
-                *iter = *(iter - 1);
-                --iter;
-            }
-            else
-                break;
-        }
-        *iter = num;
+        int *pos = lower_bound(bucket[bIdx], iter, num);
+        copy_backward(pos, iter, iter + 1);
+        *pos = num;
     }
     arr[idx] = num;
 }
@@ -54,18 +38,15 @@ int query(int left, int right, int num)
     if (bLeft == bRight)
     {
         for (int i = left; i <= right; ++i)
-            if (arr[i] > num)
-                ret++;
+            ret += (arr[i] > num);
         return ret;
     }
     for (int i = left; i < ((bLeft + 1) << B_SHIFT); ++i)
-        if (arr[i] > num)
-            ret++;
+        ret += (arr[i] > num);
     for (int b = bLeft + 1; b < bRight; ++b)
         ret += distance(upper_bound(bucket[b], bucket[b + 1], num), bucket[b + 1]);
     for (int i = bRight << B_SHIFT; i <= right; ++i)
-        if (arr[i] > num)
-            ret++;
+        ret += (arr[i] > num);
     return ret;
 }
 
