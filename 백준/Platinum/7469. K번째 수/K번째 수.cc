@@ -1,64 +1,69 @@
-// https://www.acmicpc.net/problem/7469 K번째 수 (N * logN 배열 최적화 버전)
+// https://www.acmicpc.net/problem/7469 K번째 수 (바텀업 세그먼트 트리 최적화 버전)
 #include <iostream>
+#include <vector>
 #include <algorithm>
+#include <iterator>
 
 using namespace std;
 
 const int MAX = 1000000000;
-const int MAX_N = 100001;
-// N=100000일 때 log2(N)은 약 16.6. 여유를 두어 18로 설정
-const int MAX_DEPTH = 18; 
+const int MAX_N = 100000;
 
-// vector 대신 N * logN 크기의 고정 2차원 배열 사용
-int tree[MAX_DEPTH][MAX_N];
-int arr[MAX_N];
+// 바텀업 트리를 위한 2N 크기의 벡터 배열
+vector<int> tree[2 * MAX_N];
 int n, m;
 
-// node 번호 대신 depth를 추적
-void init(int depth, int left, int right) {
-    if (left == right) {
-        tree[depth][left] = arr[left];
-        return;
+// 1. 바텀업 트리 초기화
+void init() {
+    // 리프 노드 제외한 내부 노드들을 역순으로 병합
+    for (int i = n - 1; i > 0; --i) {
+        merge(tree[i << 1].begin(), tree[i << 1].end(),
+              tree[i << 1 | 1].begin(), tree[i << 1 | 1].end(),
+              back_inserter(tree[i]));
     }
-    
-    int mid = left + (right - left) / 2;
-    
-    // 자식 노드(다음 깊이) 초기화
-    init(depth + 1, left, mid);
-    init(depth + 1, mid + 1, right);
-    
-    // 자식 깊이(depth + 1)에 정렬된 두 구간을 현재 깊이(depth)의 [left, right] 공간으로 병합
-    merge(tree[depth + 1] + left, tree[depth + 1] + mid + 1,
-          tree[depth + 1] + mid + 1, tree[depth + 1] + right + 1,
-          tree[depth] + left);
 }
 
-int count_less_equal(int depth, int left, int right, int i, int j, int val) {
-    if (right < i || j < left) return 0;
+// 2. 바텀업 구간 쿼리: [l, r] 구간 내에서 val 이하인 수의 개수 반환
+int count_less_equal(int l, int r, int val) {
+    int res = 0;
+    // 리프 노드 인덱스로 변환 (0-based)
+    l += n;
+    r += n;
     
-    if (i <= left && right <= j) {
-        // vector의 begin(), end() 대신 배열의 포인터 연산 사용
-        return int(upper_bound(tree[depth] + left, tree[depth] + right + 1, val) - (tree[depth] + left));
+    while (l <= r) {
+        // l이 오른쪽 자식이면 병합 범위에 포함 후 l 전진
+        if (l % 2 == 1) {
+            res += int(upper_bound(tree[l].begin(), tree[l].end(), val) - tree[l].begin());
+            l++;
+        }
+        // r이 왼쪽 자식이면 병합 범위에 포함 후 r 후진
+        if (r % 2 == 0) {
+            res += int(upper_bound(tree[r].begin(), tree[r].end(), val) - tree[r].begin());
+            r--;
+        }
+        // 부모 노드로 이동
+        l >>= 1;
+        r >>= 1;
     }
-    
-    int mid = left + (right - left) / 2;
-    return count_less_equal(depth + 1, left, mid, i, j, val) + 
-           count_less_equal(depth + 1, mid + 1, right, i, j, val);
+    return res;
 }
 
+// 3. 파라메트릭 서치 로직 (이전과 동일)
 int query(int i, int j, int k) {
     int left = -MAX, right = MAX;
     int ans = MAX;
     
+    // 1-based 쿼리 입력을 0-based 내부 로직에 맞게 조정
+    i--; j--; 
+    
     while (left <= right) {
         int mid = left + (right - left) / 2;
         
-        // 탐색은 항상 루트(depth 0)에서 시작
-        if (count_less_equal(0, 1, n, i, j, mid) >= k) {
+        if (count_less_equal(i, j, mid) >= k) {
             ans = mid;
-            right = mid - 1; 
+            right = mid - 1;
         } else {
-            left = mid + 1;  
+            left = mid + 1;
         }
     }
     return ans;
@@ -66,12 +71,14 @@ int query(int i, int j, int k) {
 
 void solve() {
     cin >> n >> m;
-    for (int i = 1; i <= n; i++) {
-        cin >> arr[i];
+    // 바텀업 트리는 리프 노드가 n번 인덱스부터 시작
+    for (int i = 0; i < n; i++) {
+        int val;
+        cin >> val;
+        tree[n + i].push_back(val);
     }
     
-    // 루트 노드는 깊이 0에서 시작
-    init(0, 1, n);
+    init();
     
     while (m--) {
         int i, j, k;
