@@ -1,87 +1,78 @@
-// https://www.acmicpc.net/problem/7469 K번째 수
-#include<bits/stdc++.h>
+// https://www.acmicpc.net/problem/7469 K번째 수 (N * logN 배열 최적화 버전)
+#include <iostream>
+#include <algorithm>
+
 using namespace std;
 
-typedef long long ll;
-
 const int MAX = 1000000000;
+const int MAX_N = 100001;
+// N=100000일 때 log2(N)은 약 16.6. 여유를 두어 18로 설정
+const int MAX_DEPTH = 18; 
 
-vector<int> tree[400004];
-int arr[100001], n, m, smaller;
+// vector 대신 N * logN 크기의 고정 2차원 배열 사용
+int tree[MAX_DEPTH][MAX_N];
+int arr[MAX_N];
+int n, m;
 
-void show() {
-    int i = 1, k = 1;
-    int max_depth = int(log2(n - 1)) + 2;
-    for (int d = 0; d < max_depth; d++) {
-        for (int j = i; j < i + k; j++) {
-            if (tree[j].empty()) {
-                if (j % 2 == 0) cout << "[ ]";
-                continue;
-            }
-            cout << "[";
-            for (int idx = 0; idx < tree[j].size() - 1; idx++)
-                cout << tree[j][idx] << "  ";
-            cout << tree[j].back() << "]";
-        }
-        cout << endl;
-        i += k;
-        k *= 2;
-    }
-}
-
-void init(int node, int left, int right) {
+// node 번호 대신 depth를 추적
+void init(int depth, int left, int right) {
     if (left == right) {
-        tree[node].push_back(arr[left]);
+        tree[depth][left] = arr[left];
         return;
     }
-    int mid = (left + right) / 2;
-    init(node * 2, left, mid);
-    init(node * 2 + 1, mid + 1, right);
-    auto li = tree[node * 2].begin(), ri = tree[node * 2 + 1].begin();
-    auto le = tree[node * 2].end(), re = tree[node * 2 + 1].end();
-    while (li != le || ri != re) {
-        if (ri == re || (li != le && *li < *ri)) tree[node].push_back(*li++);
-        else tree[node].push_back(*ri++);
-    }
+    
+    int mid = left + (right - left) / 2;
+    
+    // 자식 노드(다음 깊이) 초기화
+    init(depth + 1, left, mid);
+    init(depth + 1, mid + 1, right);
+    
+    // 자식 깊이(depth + 1)에 정렬된 두 구간을 현재 깊이(depth)의 [left, right] 공간으로 병합
+    merge(tree[depth + 1] + left, tree[depth + 1] + mid + 1,
+          tree[depth + 1] + mid + 1, tree[depth + 1] + right + 1,
+          tree[depth] + left);
 }
 
-bool count(int node, int left, int right, int i, int j, int num) {
-    if (right < i || j < left)
-        return false;
+int count_less_equal(int depth, int left, int right, int i, int j, int val) {
+    if (right < i || j < left) return 0;
+    
     if (i <= left && right <= j) {
-        auto lb = lower_bound(tree[node].begin(), tree[node].end(), num);
-        smaller += int(lb - tree[node].begin());
-        return lb != tree[node].end() && *lb == num;
+        // vector의 begin(), end() 대신 배열의 포인터 연산 사용
+        return int(upper_bound(tree[depth] + left, tree[depth] + right + 1, val) - (tree[depth] + left));
     }
-    int mid = (left + right) / 2;
-    if (count(node * 2, left, mid, i, j, num)) {
-        count(node * 2 + 1, mid + 1, right, i, j, num);
-        return true;
-    }
-    return count(node * 2 + 1, mid + 1, right, i, j, num);
+    
+    int mid = left + (right - left) / 2;
+    return count_less_equal(depth + 1, left, mid, i, j, val) + 
+           count_less_equal(depth + 1, mid + 1, right, i, j, val);
 }
 
 int query(int i, int j, int k) {
     int left = -MAX, right = MAX;
-    while (left < right) {
-        int mid = ((left + right < 0) ? (left + right - 1) / 2 : (left + right) / 2);
-        smaller = 0;
-        if (count(1, 1, n, i, j, mid) && smaller == k - 1)
-            return mid;
-        if (smaller < k) left = mid;
-        else right = mid;
+    int ans = MAX;
+    
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        
+        // 탐색은 항상 루트(depth 0)에서 시작
+        if (count_less_equal(0, 1, n, i, j, mid) >= k) {
+            ans = mid;
+            right = mid - 1; 
+        } else {
+            left = mid + 1;  
+        }
     }
-    return left;
+    return ans;
 }
-
 
 void solve() {
     cin >> n >> m;
     for (int i = 1; i <= n; i++) {
         cin >> arr[i];
     }
-    init(1, 1, n);
-    // show();
+    
+    // 루트 노드는 깊이 0에서 시작
+    init(0, 1, n);
+    
     while (m--) {
         int i, j, k;
         cin >> i >> j >> k;
@@ -89,12 +80,11 @@ void solve() {
     }
 }
 
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    int t = 1;
-    while (t--)
-        solve();
+    
+    solve();
+    
     return 0;
 }
