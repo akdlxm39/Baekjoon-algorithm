@@ -13,40 +13,30 @@ void solve()
 {
     cin >> n >> m >> r;
     for (int i = 1; i <= n; ++i)
-        cin >> items[i];
-    int u, v, c;
-    for (int i = 1; i <= n; ++i)
     {
+        cin >> items[i];
         for (int j = 1; j <= n; ++j)
             dists[i][j] = INF;
         dists[i][i] = 0;
     }
+    int u, v, c;
     for (int i = 0; i < r; ++i)
     {
         cin >> u >> v >> c;
         dists[u][v] = dists[v][u] = c;
     }
-
     for (int k = 1; k <= n; ++k)
-    {
         for (int i = 1; i <= n; ++i)
-        {
             for (int j = 1; j <= n; ++j)
-            {
                 if (dists[i][j] > dists[i][k] + dists[k][j])
                     dists[i][j] = dists[i][k] + dists[k][j];
-            }
-        }
-    }
     int ans = 0;
     for (int i = 1; i <= n; ++i)
     {
         int tmp = 0;
         for (int j = 1; j <= n; ++j)
-        {
             if (dists[i][j] <= m)
                 tmp += items[j];
-        }
         if (ans < tmp)
             ans = tmp;
     }
