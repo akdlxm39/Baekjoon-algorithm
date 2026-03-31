@@ -7,13 +7,13 @@ int n, r, q;
 vector<int> adj_list[100'001];
 int childCnt[100'001];
 
-int makeTree(int cur, int par)
+int makeTree(int cur)
 {
-    int ret = 1;
+    childCnt[cur] = 1;
     for (int nxt : adj_list[cur])
-        if (nxt != par)
-            ret += makeTree(nxt, cur);
-    return childCnt[cur] = ret;
+        if (childCnt[nxt] == 0)
+            childCnt[cur] += makeTree(nxt);
+    return childCnt[cur];
 }
 
 void solve()
@@ -26,7 +26,7 @@ void solve()
         adj_list[u].push_back(v);
         adj_list[v].push_back(u);
     }
-    makeTree(r, 0);
+    makeTree(r);
     for (int i = 0; i < q; ++i)
     {
         cin >> u;
