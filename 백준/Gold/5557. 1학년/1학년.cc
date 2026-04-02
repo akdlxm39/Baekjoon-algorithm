@@ -10,11 +10,9 @@ void solve()
 {
     cin >> n;
     for (int i = 0, x; i < n; ++i)
-    {
         cin >> nums[i];
-    }
-    dp[0][nums[0]] = 1;
-    for (int i = 0; i < n - 1; ++i)
+    dp[0][nums[0]] = 1LL;
+    for (int i = 0; i < n - 2; ++i)
     {
         for (int j = 0; j <= 20; ++j)
         {
