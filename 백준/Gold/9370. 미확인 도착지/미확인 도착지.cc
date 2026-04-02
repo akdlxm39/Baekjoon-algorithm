@@ -24,19 +24,17 @@ int n, m, t, s, g, h;
 vector<Edge> adj_list[2001];
 priority_queue<Node> pq;
 int dist[2001];
-vector<int> ans;
+vector<int> candi;
 
 void solve()
 {
+
+    cin >> n >> m >> t >> s >> g >> h;
     for (int i = 1; i <= n; ++i)
     {
         adj_list[i].clear();
         dist[i] = INF;
     }
-    pq = priority_queue<Node>();
-    ans.clear();
-
-    cin >> n >> m >> t >> s >> g >> h;
     for (int i = 0, a, b, d; i < m; ++i)
     {
         cin >> a >> b >> d;
@@ -44,6 +42,11 @@ void solve()
         adj_list[a].push_back({b, d});
         adj_list[b].push_back({a, d});
     }
+    candi.resize(t);
+    for (int &x : candi)
+        cin >> x;
+    sort(candi.begin(), candi.end());
+    pq = priority_queue<Node>();
     dist[s] = 0;
     pq.push({s, 0});
     while (!pq.empty())
@@ -61,15 +64,9 @@ void solve()
             pq.push(nxt);
         }
     }
-    for (int i = 0, x; i < t; ++i)
-    {
-        cin >> x;
+    for (int x : candi)
         if (dist[x] & 1)
-            ans.push_back(x);
-    }
-    sort(ans.begin(), ans.end());
-    for (int x : ans)
-        cout << x << ' ';
+            cout << x << ' ';
     cout << '\n';
 }
 
@@ -78,8 +75,7 @@ int main()
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    for (int i = 1; i <= 2000; ++i)
-        dist[i] = INF;
+    candi.reserve(2000);
 
     int TC;
     cin >> TC;
