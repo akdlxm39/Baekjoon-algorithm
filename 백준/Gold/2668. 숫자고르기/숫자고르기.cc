@@ -5,23 +5,21 @@ using namespace std;
 
 int n;
 int nums[101];
+int state[101];
 bool isCycle[101];
-bool visited[101];
-bool checked[101];
 int ans;
 vector<int> st;
 
 int checkCycle(int cur)
 {
-    if (visited[cur])
+    if (state[cur] == 1)
         return cur;
-    if (checked[cur])
+    if (state[cur] == 2)
         return 0;
-    checked[cur] = true;
-    visited[cur] = true;
+    state[cur] = 1;
     st.push_back(cur);
     int root = checkCycle(nums[cur]);
-    visited[cur] = false;
+    state[cur] = 2;
     if (root == cur)
     {
         while (true)
@@ -45,7 +43,7 @@ void solve()
         cin >> nums[i];
     for (int i = 1; i <= n; ++i)
     {
-        if (!checked[i])
+        if (state[i] == 0)
         {
             st.clear();
             checkCycle(i);
