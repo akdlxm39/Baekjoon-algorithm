@@ -10,7 +10,6 @@ const int INF = 21e8;
 struct Edge
 {
     int to, dist;
-    bool isPassed;
 };
 struct Node
 {
@@ -25,7 +24,6 @@ int n, m, t, s, g, h;
 vector<Edge> adj_list[2001];
 priority_queue<Node> pq;
 int dist[2001];
-bool isDest[2001];
 vector<int> ans;
 
 void solve()
@@ -34,7 +32,6 @@ void solve()
     {
         adj_list[i].clear();
         dist[i] = INF;
-        isDest[i] = false;
     }
     pq = priority_queue<Node>();
     ans.clear();
@@ -43,9 +40,9 @@ void solve()
     for (int i = 0, a, b, d; i < m; ++i)
     {
         cin >> a >> b >> d;
-        bool p = (a == g && b == h) || (a == h && b == g);
-        adj_list[a].push_back({b, d, p});
-        adj_list[b].push_back({a, d, p});
+        d = d * 2 - ((a == g && b == h) || (a == h && b == g));
+        adj_list[a].push_back({b, d});
+        adj_list[b].push_back({a, d});
     }
     dist[s] = 0;
     pq.push({s, 0});
@@ -58,22 +55,16 @@ void solve()
         for (const Edge &e : adj_list[cur.id])
         {
             Node nxt = {e.to, cur.dist + e.dist};
-            if (dist[nxt.id] < nxt.dist)
+            if (dist[nxt.id] <= nxt.dist)
                 continue;
-            else if (dist[nxt.id] == nxt.dist)
-            {
-                isDest[nxt.id] = isDest[nxt.id] || isDest[cur.id] || e.isPassed;
-                continue;
-            }
             dist[nxt.id] = nxt.dist;
-            isDest[nxt.id] = isDest[cur.id] || e.isPassed;
             pq.push(nxt);
         }
     }
     for (int i = 0, x; i < t; ++i)
     {
         cin >> x;
-        if (isDest[x])
+        if (dist[x] & 1)
             ans.push_back(x);
     }
     sort(ans.begin(), ans.end());
