@@ -68,9 +68,8 @@ void solve()
             ans.push_back(x);
     }
     sort(ans.begin(), ans.end());
-    cout << ans[0];
-    for (int i = 1; i < ans.size(); ++i)
-        cout << ' ' << ans[i];
+    for (int x : ans)
+        cout << x << ' ';
     cout << '\n';
 }
 
