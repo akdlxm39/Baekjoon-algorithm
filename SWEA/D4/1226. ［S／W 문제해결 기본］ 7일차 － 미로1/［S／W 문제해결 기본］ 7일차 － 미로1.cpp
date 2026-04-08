@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -7,7 +8,6 @@ struct Point
     int y, x;
     Point operator+(Point other) const;
     bool isValid() const;
-    void visit() const;
 };
 
 const int SIZE = 16;
@@ -27,20 +27,13 @@ inline bool Point::isValid() const
     return 0 <= y && y < SIZE && 0 <= x && x < SIZE && map_[y][x] != '1';
 }
 
-inline void Point::visit() const
-{
-    map_[y][x] = '1';
-}
-
 bool dfs(Point cur)
 {
-    if (map_[cur.x][cur.y] == '3')
-        return true;
-    cur.visit();
+    map_[cur.y][cur.x] = '1';
     for (Point d : DIR)
     {
         Point nxt = cur + d;
-        if (nxt.isValid() && dfs(nxt))
+        if (nxt.isValid() && (map_[nxt.y][nxt.x] == '3' || dfs(nxt)))
             return true;
     }
     return false;
