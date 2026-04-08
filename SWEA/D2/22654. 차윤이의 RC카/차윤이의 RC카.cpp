@@ -99,4 +99,6 @@ int main()
         cout << '#' << testCase << ' ';
         output();
     }
+
+    return 0;
 }
