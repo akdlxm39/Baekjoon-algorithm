@@ -7,10 +7,10 @@ using namespace std;
 struct Point
 {
     int y, x;
-    inline Point operator+(Point other) const;
-    inline void operator+=(Point other);
-    inline bool isVaild() const;
-    inline char &map();
+    Point operator+(Point other) const;
+    void operator+=(Point other);
+    bool isValid() const;
+    char &map() const;
 };
 
 const string TANK = "^v<>";
@@ -32,32 +32,32 @@ inline void Point::operator+=(Point other)
     x += other.x;
 }
 
-inline bool Point::isVaild() const
+inline bool Point::isValid() const
 {
     return 0 <= y && y < height && 0 <= x && x < width;
 }
 
-inline char &Point::map()
+inline char &Point::map() const
 {
     return map_[y][x];
 }
 
-inline void move(int di)
+void move(int di)
 {
     curDir = di;
     cur.map() = TANK[curDir];
     Point nxt = cur + DIR[curDir];
-    if (nxt.isVaild() && nxt.map() == '.')
+    if (nxt.isValid() && nxt.map() == '.')
     {
         swap(cur.map(), nxt.map());
         cur = nxt;
     }
 }
 
-inline void shoot()
+void shoot()
 {
     Point shell = cur + DIR[curDir];
-    while (shell.isVaild())
+    while (shell.isValid())
     {
         if (shell.map() == '*')
         {
@@ -94,18 +94,26 @@ void input()
 
 void solve()
 {
-    for (auto command : commands)
+    for (char command : commands)
     {
-        if (command == 'U')
+        switch (command)
+        {
+        case 'U':
             move(0);
-        else if (command == 'D')
+            break;
+        case 'D':
             move(1);
-        else if (command == 'L')
+            break;
+        case 'L':
             move(2);
-        else if (command == 'R')
+            break;
+        case 'R':
             move(3);
-        else if (command == 'S')
+            break;
+        case 'S':
             shoot();
+            break;
+        }
     }
 }
 
@@ -130,4 +138,6 @@ int main()
         cout << '#' << test_case << ' ';
         output();
     }
+
+    return 0;
 }
