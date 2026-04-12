@@ -7,18 +7,10 @@ using namespace std;
 struct Point
 {
     int y, x;
-    Point operator+(Point other) const
-    {
-        return {y + other.y, x + other.x};
-    }
     void operator+=(Point other)
     {
         y += other.y;
         x += other.x;
-    }
-    bool isValid() const
-    {
-        return 1 <= y && y <= 10 && 1 <= x && x <= 10;
     }
 };
 constexpr Point DIR[5] = {{0, 0}, {-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -30,59 +22,26 @@ int power[8];
 
 void bfsBC(int y, int x, int c, int mask)
 {
-    queue<Point> q, nxt_q;
-    q.push({y, x});
-    map_[y][x] |= mask;
-    while (c--)
-    {
-        while (!q.empty())
-        {
-            Point cur = q.front();
-            q.pop();
-            for (Point d : DIR)
-            {
-                Point nxt = cur + d;
-                if (!nxt.isValid() || map_[nxt.y][nxt.x] & mask)
-                    continue;
-                nxt_q.push(nxt);
-                map_[nxt.y][nxt.x] |= mask;
-            }
-        }
-        q.swap(nxt_q);
-    }
+    for (int i = 1; i <= 10; ++i)
+        for (int j = 1; j <= 10; ++j)
+            if (abs(i - y) + abs(j - x) <= c)
+                map_[i][j] |= mask;
 }
 
 int maxCharge(int bc1, int bc2)
 {
     int ret = 0;
-    if (bc1 && bc2)
+    for (int i = 0; i < a; ++i)
     {
-        for (int i = 0; i < a; ++i)
+        int p1 = (bc1 & (1 << i)) ? power[i] : 0;
+        for (int j = 0; j < a; ++j)
         {
-            if (!(bc1 & (1 << i)))
-                continue;
-            for (int j = 0; j < a; ++j)
-            {
-                if (!(bc2 & (1 << j)))
-                    continue;
-                if (i == j)
-                    ret = max(ret, power[i]);
-                else
-                    ret = max(ret, power[i] + power[j]);
-            }
+            int p2 = (bc2 & (1 << j)) ? power[j] : 0;
+            if (i == j && p1 && p2)
+                ret = max(ret, p1);
+            else
+                ret = max(ret, p1 + p2);
         }
-    }
-    else if (bc1)
-    {
-        for (int i = 0; i < a; ++i)
-            if (bc1 & (1 << i))
-                ret = max(ret, power[i]);
-    }
-    else if (bc2)
-    {
-        for (int i = 0; i < a; ++i)
-            if (bc2 & (1 << i))
-                ret = max(ret, power[i]);
     }
     return ret;
 }
