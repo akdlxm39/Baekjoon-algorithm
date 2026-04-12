@@ -37,16 +37,16 @@ void setBC(Point bc, int c, int mask)
 int maxCharge(int maskA, int maskB)
 {
     int ret = 0;
-    for (int i1 = 0; i1 < a; ++i1)
+    for (int iA = 0; iA < a; ++iA)
     {
-        int p1 = (maskA & (1 << i1)) ? power[i1] : 0;
-        for (int i2 = 0; i2 < a; ++i2)
+        int pA = (maskA & (1 << iA)) ? power[iA] : 0;
+        for (int iB = 0; iB < a; ++iB)
         {
-            int p2 = (maskB & (1 << i2)) ? power[i2] : 0;
-            if (i1 == i2 && p1 && p2)
-                ret = max(ret, p1);
+            int pB = (maskB & (1 << iB)) ? power[iB] : 0;
+            if (iA == iB && pA && pB)
+                ret = max(ret, pA);
             else
-                ret = max(ret, p1 + p2);
+                ret = max(ret, pA + pB);
         }
     }
     return ret;
