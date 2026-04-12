@@ -1,7 +1,5 @@
 from collections import deque
 
-DIR = ((-1, 0), (1, 0), (0, -1), (0, 1))
-
 
 def solve():
     n = int(input())
@@ -17,6 +15,7 @@ def solve():
     q = deque([(start_y, start_x, 0)])
     visited = [[False] * n for _ in range(n)]
     visited[start_y][start_x] = True
+    DIR = ((-1, 0), (1, 0), (0, -1), (0, 1))
     while q:
         y, x, dist = q.popleft()
         for dy, dx in DIR:
