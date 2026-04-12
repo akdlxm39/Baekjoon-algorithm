@@ -1,5 +1,10 @@
 from collections import deque
 
+n = 0
+ans = 0
+map_ = []
+dist_ = []
+
 
 class Point:
     def __init__(self, y, x):
@@ -9,41 +14,75 @@ class Point:
     def __add__(self, other):
         return Point(self.y + other.y, self.x + other.x)
 
-    def is_valid(self, n, map_, dist):
+    def is_valid(self):
         return (
             0 <= self.y < n
             and 0 <= self.x < n
             and map_[self.y][self.x] != "1"
-            and dist[self.y][self.x] == -1
+            and dist_[self.y][self.x] == -1
         )
 
+    def map_val(self):
+        return map_[self.y][self.x]
 
-DIR = (Point(-1, 0), Point(1, 0), Point(0, -1), Point(0, 1))
+    def get_dist(self):
+        return dist_[self.y][self.x]
+
+    def set_dist(self, val):
+        dist_[self.y][self.x] = val
 
 
-def solve():
-    n: int = int(input())
-    map_: list[str] = [input() for _ in range(n)]
-    dist: list[list[int]] = [[-1] * n for _ in range(n)]
-    queue: deque[Point] = deque()
-    for i, s in enumerate(map_):
-        j = s.find("2")
-        if j != -1:
-            queue.append(Point(i, j))
-            dist[i][j] = 0
-            break
-    while queue:
-        cur = queue.popleft()
+start: Point = Point(-1, -1)
+
+
+# 방향 벡터
+DIR = [Point(-1, 0), Point(1, 0), Point(0, -1), Point(0, 1)]
+
+
+def bfs():
+    q: deque[Point] = deque([start])
+    start.set_dist(0)
+    while q:
+        cur = q.popleft()
         for d in DIR:
             nxt = cur + d
-            if not nxt.is_valid(n, map_, dist):
+            if not nxt.is_valid():
                 continue
-            if map_[nxt.y][nxt.x] == "3":
-                return dist[cur.y][cur.x]
-            dist[nxt.y][nxt.x] = dist[cur.y][cur.x] + 1
-            queue.append(nxt)
+            if nxt.map_val() == "3":
+                return cur.get_dist()
+            nxt.set_dist(cur.get_dist() + 1)
+            q.append(nxt)
     return 0
 
 
-for test_case in range(1, int(input()) + 1):
-    print(f"#{test_case} {solve()}")
+def input_data():
+    global n, map_, dist_, start
+    n = int(input())
+    map_ = []
+    dist_ = []
+    for i in range(n):
+        row = input()
+        map_.append(row)
+        dist_.append([-1] * n)
+        if "2" in row:
+            start = Point(i, row.index("2"))
+
+
+def solve():
+    global ans
+    ans = bfs()
+
+
+def output(test_case):
+    print(f"#{test_case} {ans}")
+
+
+def main():
+    for test_case in range(1, int(input()) + 1):
+        input_data()
+        solve()
+        output(test_case)
+
+
+if __name__ == "__main__":
+    main()
