@@ -21,8 +21,8 @@ int dfs(int cur, int dist)
 
 void init()
 {
-    memset(adj_matrix[0], true, sizeof(bool) * 11);
-    memset(adj_matrix[1], false, sizeof(bool) * 10 * 11);
+    memset(adj_matrix, false, sizeof(adj_matrix));
+    memset(adj_matrix[0], true, sizeof(adj_matrix[0]));
 }
 
 void input()
@@ -49,7 +49,7 @@ void output(int testCase)
 int main()
 {
     ios_base::sync_with_stdio(false);
-    cin.tie();
+    cin.tie(nullptr);
 
     int T;
     cin >> T;
