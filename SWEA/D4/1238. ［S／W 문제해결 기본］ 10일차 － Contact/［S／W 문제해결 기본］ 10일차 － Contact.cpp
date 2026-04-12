@@ -1,12 +1,12 @@
 #include <iostream>
 #include <queue>
-#include <unordered_set>
+#include <cstring>
 
 using namespace std;
 
 constexpr int INF = int(1e9);
 
-unordered_set<int> adj_list[101];
+bool adj_matrix[101][101];
 int dist[101];
 int start, ans;
 
@@ -29,9 +29,9 @@ int bfs()
         {
             ret = cur;
         }
-        for (int nxt : adj_list[cur])
+        for (int nxt = 1; nxt <= 100; ++nxt)
         {
-            if (dist[nxt] == INF)
+            if (adj_matrix[cur][nxt] && dist[nxt] == -1)
             {
                 q.push(nxt);
                 dist[nxt] = dist[cur] + 1;
@@ -43,11 +43,8 @@ int bfs()
 
 void init()
 {
-    for (int i = 1; i <= 100; ++i)
-    {
-        dist[i] = INF;
-        adj_list[i].clear();
-    }
+    memset(adj_matrix, false, sizeof(adj_matrix));
+    memset(dist, -1, sizeof(dist));
 }
 
 void input()
@@ -59,7 +56,7 @@ void input()
     {
         int from, to;
         cin >> from >> to;
-        adj_list[from].insert(to);
+        adj_matrix[from][to] = true;
     }
 }
 
