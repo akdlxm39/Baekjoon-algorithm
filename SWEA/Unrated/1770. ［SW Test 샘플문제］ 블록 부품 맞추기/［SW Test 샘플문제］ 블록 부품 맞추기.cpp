@@ -9,7 +9,7 @@
 
 static unsigned int ht_C[HASH_SIZE];
 static unsigned char ht_max_diff[HASH_SIZE];
-static unsigned short ht_counts[HASH_SIZE][7];
+static unsigned short ht_counts[HASH_SIZE][8];
 static unsigned char state_tc[HASH_SIZE];
 static unsigned int unique_keys[MAX_N];
 static int current_tc = 0;
@@ -68,22 +68,10 @@ int makeBlock(int module[][4][4])
         int min_h = 7, max_h = -1, h;
 
         // 매크로를 이용한 직관적인 루프 언롤링
-        CHK_H(0, 0);
-        CHK_H(0, 1);
-        CHK_H(0, 2);
-        CHK_H(0, 3);
-        CHK_H(1, 0);
-        CHK_H(1, 1);
-        CHK_H(1, 2);
-        CHK_H(1, 3);
-        CHK_H(2, 0);
-        CHK_H(2, 1);
-        CHK_H(2, 2);
-        CHK_H(2, 3);
-        CHK_H(3, 0);
-        CHK_H(3, 1);
-        CHK_H(3, 2);
-        CHK_H(3, 3);
+        CHK_H(0, 0) CHK_H(0, 1) CHK_H(0, 2) CHK_H(0, 3);
+        CHK_H(1, 0) CHK_H(1, 1) CHK_H(1, 2) CHK_H(1, 3);
+        CHK_H(2, 0) CHK_H(2, 1) CHK_H(2, 2) CHK_H(2, 3);
+        CHK_H(3, 0) CHK_H(3, 1) CHK_H(3, 2) CHK_H(3, 3);
 
         unsigned int can = getCanonicalInline(module[i], min_h);
         unsigned int idx = hash32(can) & HASH_MASK;
