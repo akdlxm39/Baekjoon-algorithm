@@ -1,172 +1,193 @@
-#define MAX_NODES 480005
-#define MAX_LEAVES 30005
+#include <malloc.h>
 
-// 트라이 메모리 풀
-int children[MAX_NODES][3];
-int leaf_id[MAX_NODES];
+#define MAX_N 30000
+#define HASH_SIZE 262144
+#define HASH_MASK 262143
 
-// 단말 노드 전용 데이터 풀
-int counts[MAX_LEAVES][7];
-int leaf_shapes[MAX_LEAVES][16];
-int max_diffs[MAX_LEAVES];
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MIN4(a, b, c, d) MIN(MIN(a, b), MIN(c, d))
 
-int node_cnt;
-int unique_cnt;
+static unsigned int ht_C[HASH_SIZE];
+static unsigned char ht_max_diff[HASH_SIZE];
+static unsigned short ht_counts[HASH_SIZE][7];
+static unsigned char state_tc[HASH_SIZE];
+static unsigned int unique_keys[MAX_N];
+static int current_tc = 0;
 
-// 사전순으로 가장 앞서는 16칸 형태 배열 추출
-void getCanonicalArray(const int src[16], int out[16]) {
-    int best[16];
-    for (int i = 0; i < 16; ++i) best[i] = src[i];
-
-    int R[16];
-    // 90도
-    for (int r = 0; r < 4; ++r) 
-        for (int c = 0; c < 4; ++c) R[r * 4 + c] = src[(3 - c) * 4 + r];
-    bool smaller = false;
-    for (int i = 0; i < 16; ++i) {
-        if (R[i] != best[i]) { smaller = R[i] < best[i]; break; }
-    }
-    if (smaller) for (int i = 0; i < 16; ++i) best[i] = R[i];
-
-    // 180도
-    for (int r = 0; r < 4; ++r) 
-        for (int c = 0; c < 4; ++c) R[r * 4 + c] = src[(3 - r) * 4 + (3 - c)];
-    smaller = false;
-    for (int i = 0; i < 16; ++i) {
-        if (R[i] != best[i]) { smaller = R[i] < best[i]; break; }
-    }
-    if (smaller) for (int i = 0; i < 16; ++i) best[i] = R[i];
-
-    // 270도
-    for (int r = 0; r < 4; ++r) 
-        for (int c = 0; c < 4; ++c) R[r * 4 + c] = src[c * 4 + (3 - r)];
-    smaller = false;
-    for (int i = 0; i < 16; ++i) {
-        if (R[i] != best[i]) { smaller = R[i] < best[i]; break; }
-    }
-    if (smaller) for (int i = 0; i < 16; ++i) best[i] = R[i];
-
-    for (int i = 0; i < 16; ++i) out[i] = best[i];
+inline unsigned int hash32(unsigned int x)
+{
+    x ^= x >> 16;
+    x *= 0x85ebca6b;
+    x ^= x >> 13;
+    x *= 0xc2b2ae35;
+    x ^= x >> 16;
+    return x;
 }
 
-int makeBlock(int module[][4][4]) {
-    // 1. 메모리 풀 초기화 (매 TC마다 첫 루트 노드만 초기화)
-    children[0][0] = children[0][1] = children[0][2] = 0;
-    leaf_id[0] = -1;
-    node_cnt = 1;
-    unique_cnt = 0;
-    
-    // 2. 블록 전처리 및 트라이 삽입
-    for (int i = 0; i < 30000; ++i) {
-        int min_h = 7, max_h = -1;
-        for (int r = 0; r < 4; ++r) {
-            for (int c = 0; c < 4; ++c) {
-                int h = module[i][r][c];
-                if (h < min_h) min_h = h;
-                if (h > max_h) max_h = h;
-            }
+// 추출 및 비트 시프트를 위한 매크로 (코드 가독성 극대화)
+#define V(r, c) (module_i[r][c] - min_h)
+
+inline unsigned int getCanonicalInline(const int module_i[4][4], int min_h)
+{
+    unsigned int b0 = (V(0, 0) << 30) | (V(0, 1) << 28) | (V(0, 2) << 26) | (V(0, 3) << 24) | (V(1, 0) << 22) |
+                      (V(1, 1) << 20) | (V(1, 2) << 18) | (V(1, 3) << 16) | (V(2, 0) << 14) | (V(2, 1) << 12) |
+                      (V(2, 2) << 10) | (V(2, 3) << 8) | (V(3, 0) << 6) | (V(3, 1) << 4) | (V(3, 2) << 2) | V(3, 3);
+
+    unsigned int b1 = (V(3, 0) << 30) | (V(2, 0) << 28) | (V(1, 0) << 26) | (V(0, 0) << 24) | (V(3, 1) << 22) |
+                      (V(2, 1) << 20) | (V(1, 1) << 18) | (V(0, 1) << 16) | (V(3, 2) << 14) | (V(2, 2) << 12) |
+                      (V(1, 2) << 10) | (V(0, 2) << 8) | (V(3, 3) << 6) | (V(2, 3) << 4) | (V(1, 3) << 2) | V(0, 3);
+
+    unsigned int b2 = (V(3, 3) << 30) | (V(3, 2) << 28) | (V(3, 1) << 26) | (V(3, 0) << 24) | (V(2, 3) << 22) |
+                      (V(2, 2) << 20) | (V(2, 1) << 18) | (V(2, 0) << 16) | (V(1, 3) << 14) | (V(1, 2) << 12) |
+                      (V(1, 1) << 10) | (V(1, 0) << 8) | (V(0, 3) << 6) | (V(0, 2) << 4) | (V(0, 1) << 2) | V(0, 0);
+
+    unsigned int b3 = (V(0, 3) << 30) | (V(1, 3) << 28) | (V(2, 3) << 26) | (V(3, 3) << 24) | (V(0, 2) << 22) |
+                      (V(1, 2) << 20) | (V(2, 2) << 18) | (V(3, 2) << 16) | (V(0, 1) << 14) | (V(1, 1) << 12) |
+                      (V(2, 1) << 10) | (V(3, 1) << 8) | (V(0, 0) << 6) | (V(1, 0) << 4) | (V(2, 0) << 2) | V(3, 0);
+
+    unsigned int best = MIN4(b0, b1, b2, b3);
+    return best;
+}
+
+// 반복 갱신용 매크로
+#define CHK_H(r, c)                                                                                                    \
+    h = module[i][r][c];                                                                                               \
+    if (h < min_h)                                                                                                     \
+        min_h = h;                                                                                                     \
+    if (h > max_h)                                                                                                     \
+        max_h = h;
+
+int makeBlock(int module[][4][4])
+{
+    current_tc += 2;
+
+    int unique_cnt = 0;
+
+    for (int i = 0; i < MAX_N; ++i)
+    {
+        int min_h = 7, max_h = -1, h;
+
+        // 매크로를 이용한 직관적인 루프 언롤링
+        CHK_H(0, 0);
+        CHK_H(0, 1);
+        CHK_H(0, 2);
+        CHK_H(0, 3);
+        CHK_H(1, 0);
+        CHK_H(1, 1);
+        CHK_H(1, 2);
+        CHK_H(1, 3);
+        CHK_H(2, 0);
+        CHK_H(2, 1);
+        CHK_H(2, 2);
+        CHK_H(2, 3);
+        CHK_H(3, 0);
+        CHK_H(3, 1);
+        CHK_H(3, 2);
+        CHK_H(3, 3);
+
+        unsigned int can = getCanonicalInline(module[i], min_h);
+        unsigned int idx = hash32(can) & HASH_MASK;
+
+        while ((state_tc[idx] & 0xFE) == current_tc && ht_C[idx] != can)
+        {
+            idx = (idx + 1) & HASH_MASK;
         }
-        
-        int diff = max_h - min_h;
-        int norm1D[16];
-        for (int r = 0; r < 4; ++r) {
-            for (int c = 0; c < 4; ++c) {
-                norm1D[r * 4 + c] = module[i][r][c] - min_h;
-            }
+
+        if ((state_tc[idx] & 0xFE) != current_tc)
+        {
+            state_tc[idx] = current_tc;
+            ht_C[idx] = can;
+            ht_max_diff[idx] = max_h - min_h;
+            ht_counts[idx][1] = ht_counts[idx][2] = ht_counts[idx][3] = 0;
+            ht_counts[idx][4] = ht_counts[idx][5] = ht_counts[idx][6] = 0;
+            unique_keys[unique_cnt++] = can;
         }
-        
-        int can[16];
-        getCanonicalArray(norm1D, can);
-        
-        // 트라이 삽입
-        int u = 0;
-        for (int k = 0; k < 16; ++k) {
-            int val = can[k];
-            if (!children[u][val]) {
-                children[u][val] = node_cnt;
-                children[node_cnt][0] = children[node_cnt][1] = children[node_cnt][2] = 0;
-                leaf_id[node_cnt] = -1;
-                node_cnt++;
-            }
-            u = children[u][val];
-        }
-        
-        // 새 단말 노드인 경우 데이터 풀 등록
-        if (leaf_id[u] == -1) {
-            leaf_id[u] = unique_cnt;
-            for (int k = 0; k < 16; ++k) leaf_shapes[unique_cnt][k] = can[k];
-            for (int k = 0; k < 7; ++k) counts[unique_cnt][k] = 0;
-            max_diffs[unique_cnt] = diff;
-            unique_cnt++;
-        }
-        
-        counts[leaf_id[u]][min_h]++;
+        ht_counts[idx][min_h]++;
     }
-    
+
     int total_cost = 0;
-    
-    // 3. 고유 형태(unique_cnt)별 짝 찾기 (Counting Sort 응용)
-    for (int l = 0; l < unique_cnt; ++l) {
-        int comp[16];
-        int md = max_diffs[l];
-        
-        // 보수 및 좌우 반전 형태 계산
-        for (int r = 0; r < 4; ++r) {
-            for (int c = 0; c < 4; ++c) {
-                comp[r * 4 + c] = md - leaf_shapes[l][r * 4 + (3 - c)];
-            }
+
+    for (int u = 0; u < unique_cnt; ++u)
+    {
+        unsigned int current_C = unique_keys[u];
+        unsigned int idx1 = hash32(current_C) & HASH_MASK;
+        while ((state_tc[idx1] & 0xFE) == current_tc && ht_C[idx1] != current_C)
+        {
+            idx1 = (idx1 + 1) & HASH_MASK;
         }
-        
-        int target_can[16];
-        getCanonicalArray(comp, target_can);
-        
-        // 트라이 탐색
-        int u = 0;
-        bool found = true;
-        for (int k = 0; k < 16; ++k) {
-            int val = target_can[k];
-            if (!children[u][val]) { found = false; break; }
-            u = children[u][val];
+
+        if (state_tc[idx1] == current_tc + 1)
+            continue;
+
+        int max_d = ht_max_diff[idx1];
+        int comp_arr[4][4];
+
+        for (int k = 15; k >= 0; --k)
+        {
+            int r = k / 4, c = k % 4;
+            comp_arr[r][3 - c] = max_d - (current_C & 0x3);
+            current_C >>= 2;
         }
-        
-        if (found && leaf_id[u] != -1) {
-            int target_l = leaf_id[u];
-            
-            if (l == target_l) {
-                // 자기 자신이 보수인 형태: 내부에서 자체 매칭
-                int p = 6;
-                while (p >= 1) {
-                    if (counts[l][p] >= 2) {
-                        counts[l][p] -= 2;
-                        total_cost += (p + p + md);
-                    } else if (counts[l][p] == 1) {
-                        int next_p = p - 1;
-                        while (next_p >= 1 && counts[l][next_p] == 0) next_p--;
-                        if (next_p >= 1) {
-                            counts[l][p]--;
-                            counts[l][next_p]--;
-                            total_cost += (p + next_p + md);
-                        } else {
-                            break;
-                        }
-                    } else {
-                        p--;
+
+        unsigned int target_can = getCanonicalInline(comp_arr, 0);
+
+        if (ht_C[idx1] == target_can)
+        {
+            int max_val = 0, left = 0;
+            for (int p = 6; p >= 1; --p)
+            {
+                while (ht_counts[idx1][p] > 0)
+                {
+                    if (left == 0)
+                    {
+                        max_val = p;
+                        left = 1;
                     }
-                }
-            } else if (l < target_l) {
-                // 서로 다른 두 형태 매칭 (중복 연산 방지를 위해 l < target_l 인 경우만 처리)
-                int p1 = 6, p2 = 6;
-                while (p1 >= 1 && p2 >= 1) {
-                    if (counts[l][p1] == 0) { p1--; continue; }
-                    if (counts[target_l][p2] == 0) { p2--; continue; }
-                    
-                    counts[l][p1]--;
-                    counts[target_l][p2]--;
-                    total_cost += (p1 + p2 + md);
+                    else
+                    {
+                        total_cost += (max_val + p + max_d);
+                        left = 0;
+                    }
+                    ht_counts[idx1][p]--;
                 }
             }
+            state_tc[idx1] = current_tc + 1;
+        }
+        else
+        {
+            unsigned int idx2 = hash32(target_can) & HASH_MASK;
+            while ((state_tc[idx2] & 0xFE) == current_tc && ht_C[idx2] != target_can)
+            {
+                idx2 = (idx2 + 1) & HASH_MASK;
+            }
+
+            if ((state_tc[idx2] & 0xFE) == current_tc)
+            {
+                int p1 = 6, p2 = 6;
+                while (p1 >= 1 && p2 >= 1)
+                {
+                    if (ht_counts[idx1][p1] == 0)
+                    {
+                        p1--;
+                        continue;
+                    }
+                    if (ht_counts[idx2][p2] == 0)
+                    {
+                        p2--;
+                        continue;
+                    }
+
+                    int pairs = MIN(ht_counts[idx1][p1], ht_counts[idx2][p2]);
+
+                    ht_counts[idx1][p1] -= pairs;
+                    ht_counts[idx2][p2] -= pairs;
+                    total_cost += pairs * (p1 + p2 + max_d);
+                }
+                state_tc[idx2] = current_tc + 1;
+            }
+            state_tc[idx1] = current_tc + 1;
         }
     }
-    
+
     return total_cost;
 }
